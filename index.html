@@ -3,32 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guías y Scouts Grupo 362 - Cervantes</title>
+    <title>Grupo 362 - Cervantes</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>Bienvenidos al Grupo 362, Cervantes</h1>
-        <nav>
-            <ul>
-                <li><a href="#">Inicio</a></li>
-                <li><a href="#">Secciones</a></li>
-                <li><a href="#">Padres</a></li>
-                <li><a href="#">Administración</a></li>
-            </ul>
-        </nav>
+
+    <nav class="navbar">
+        <div class="logo">⚜️ Grupo 362</div>
+        <ul class="nav-links">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#secciones">Secciones</a></li>
+            <li><a href="#padres">Portal Padres</a></li>
+            <li><a href="#admin" class="btn-login">Acceso Dirigentes</a></li>
+        </ul>
+    </nav>
+
+    <header id="inicio" class="hero">
+        <div class="hero-content">
+            <h1>¡Siempre Listos Para Servir!</h1>
+            <p>Únete a la gran familia de Guías y Scouts en Cervantes. Aventura, valores y amigos para toda la vida.</p>
+            <button class="btn-cta">¡Inscríbete Ahora!</button>
+        </div>
     </header>
 
-    <main>
-        <section id="inicio">
-            <h2>Construyendo un Mundo Mejor</h2>
-            <p>Únete a la aventura Scout en Cervantes. ¡Te esperamos!</p>
-            <button>¡Inscríbete aquí!</button>
-        </section>
-    </main>
+    <section id="secciones" class="secciones-container">
+        <h2>Nuestras Secciones</h2>
+        <div class="grid-cards">
+            <div class="card amarillo">
+                <h3>🐺 Manada</h3>
+                <p>Para niños y niñas de 6 a 10 años. ¡Aprende jugando!</p>
+            </div>
+            <div class="card verde">
+                <h3>🏕️ Tropa</h3>
+                <p>De 11 a 14 años. La aventura al aire libre te espera.</p>
+            </div>
+        </div>
+    </section>
 
     <footer>
-        <p>&copy; 2026 Guías y Scouts de Costa Rica - Grupo 362</p>
+        <p>Grupo 362 Cervantes - Guías y Scouts de Costa Rica &copy; 2026</p>
     </footer>
+
 </body>
 </html>
