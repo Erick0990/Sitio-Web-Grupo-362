@@ -5,30 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso - Grupo 362</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚜️</text></svg>">
 </head>
 <body class="login-body">
 
-    <div class="login-container">
-        <div class="login-box">
-            <a href="index.html" class="back-link">← Volver al inicio</a>
-            <h2>Portal del Grupo 362</h2>
-            <p>Ingresa para ver tus puntos e insignias</p>
+    <div class="login-box">
+        
+        <a href="index.html" class="back-link">← Volver al inicio</a>
+        
+        <h2>Portal del Grupo 362</h2>
+        <p>Ingresa tus credenciales scout</p>
+        
+        <form id="login-form">
+            <div class="input-group">
+                <label>Correo Electrónico</label>
+                <input type="email" placeholder="nombre@scouts.com" required>
+            </div>
             
-            <form id="login-form">
-                <div class="input-group">
-                    <label>Correo Electrónico</label>
-                    <input type="email" placeholder="tu@email.com" required>
-                </div>
-                <div class="input-group">
-                    <label>Contraseña</label>
-                    <input type="password" placeholder="••••••••" required>
-                </div>
-                <a href="dashboard.html" class="btn-login-submit">Entrar al Sistema</a>
-</a>
-            </form>
-            
-            <p class="form-footer">¿No tienes cuenta? <a href="#">Contacta a tu dirigente</a></p>
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" placeholder="••••••••" required>
+            </div>
+
+            <a href="dashboard.html" class="btn-login-submit">Entrar al Sistema</a>
+        </form>
+        
+        <div class="form-footer">
+            ¿No tienes cuenta? <a href="#">Contacta a tu dirigente</a>
         </div>
     </div>
 
