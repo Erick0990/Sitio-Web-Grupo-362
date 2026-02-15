@@ -1,5 +1,5 @@
-/* Importar fuentes modernas */
-@import url(portada-web-362.png);
+/* 1. Importamos la FUENTE (esto es código, por eso usa @import) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
 
 :root {
     --primary: #004a99;
@@ -25,7 +25,7 @@ body {
 /* NAVBAR MODERNA */
 .navbar {
     background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px); /* Efecto vidrio esmerilado */
+    backdrop-filter: blur(10px);
     padding: 1.2rem 8%;
     display: flex;
     justify-content: space-between;
@@ -69,11 +69,12 @@ body {
     font-weight: 600;
 }
 
-/* HERO SECTION (EL IMPACTO) */
+/* HERO SECTION (Donde usamos tu imagen) */
 .hero {
     height: 90vh;
+    /* Las imágenes se ponen aquí, NO en el @import de arriba */
     background: linear-gradient(135deg, rgba(0,74,153,0.8), rgba(76,175,80,0.7)), 
-               url(portada-web-362.png);
+                url('portada-web-362.png'); 
     background-size: cover;
     background-position: center;
     display: flex;
@@ -116,7 +117,7 @@ body {
     box-shadow: 0 15px 25px rgba(255, 204, 0, 0.4);
 }
 
-/* SECCIONES (CARDS TIPO LOVABLE) */
+/* SECCIONES (CARDS) */
 .secciones-container {
     padding: 100px 10%;
     max-width: 1200px;
@@ -152,7 +153,8 @@ body {
     color: #64748b;
     margin-bottom: 25px;
 }
-/* ESTILOS PARA EL LOGIN */
+
+/* LOGIN */
 .login-body {
     background: linear-gradient(135deg, #004a99, #4caf50);
     height: 100vh;
