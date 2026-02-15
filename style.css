@@ -221,3 +221,71 @@ body {
 .btn-login-submit:hover {
     background: #003366;
 }
+/* ESTILOS DEL DASHBOARD */
+.dashboard-body {
+    background-color: #f1f5f9;
+}
+
+.dashboard-container {
+    padding: 120px 8% 50px; /* Más espacio arriba por la navbar fija */
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.puntos-badge {
+    background: var(--accent);
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--dark);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+}
+
+.dash-card {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* LA BARRA DE PROGRESO (Ingeniería visual) */
+.progress-bar-container {
+    background: #e2e8f0;
+    height: 12px;
+    border-radius: 10px;
+    margin-top: 15px;
+    overflow: hidden; /* Para que el relleno no se salga de las esquinas */
+}
+
+.progress-fill {
+    background: var(--secondary); /* El verde scout */
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease-in-out; /* Para que la barra "crezca" suavemente */
+}
+
+.badges-row {
+    font-size: 2rem;
+    display: flex;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.logout-link {
+    color: #ef4444; /* Rojo para advertir salida */
+    text-decoration: none;
+    font-weight: 600;
+}
