@@ -1,5 +1,5 @@
 /* Importar fuentes modernas */
-@import portada-web-362.png;
+@import url(portada-web-362.png);
 
 :root {
     --primary: #004a99;
@@ -73,7 +73,7 @@ body {
 .hero {
     height: 90vh;
     background: linear-gradient(135deg, rgba(0,74,153,0.8), rgba(76,175,80,0.7)), 
-                portada-web-362.png;
+               url(portada-web-362.png);
     background-size: cover;
     background-position: center;
     display: flex;
