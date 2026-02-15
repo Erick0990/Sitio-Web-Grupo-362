@@ -1,5 +1,5 @@
 /* Importar fuentes modernas */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+@import portada-web-362.png;
 
 :root {
     --primary: #004a99;
@@ -73,7 +73,7 @@ body {
 .hero {
     height: 90vh;
     background: linear-gradient(135deg, rgba(0,74,153,0.8), rgba(76,175,80,0.7)), 
-                url('https://images.unsplash.com/photo-1517263904808-5dc91e3e7044?auto=format&fit=crop&q=80');
+                portada-web-362.png;
     background-size: cover;
     background-position: center;
     display: flex;
