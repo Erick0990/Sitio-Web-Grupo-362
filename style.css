@@ -1,14 +1,19 @@
-/* 1. Importamos la FUENTE (esto es código, por eso usa @import) */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+/* 1. CONFIGURACIÓN, FUENTES Y VARIABLES */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&display=swap');
 
 :root {
     --primary: #004a99;
+    --primary-dark: #003366;
     --secondary: #4caf50;
     --accent: #ffcc00;
     --dark: #1e293b;
     --light: #f8fafc;
     --white: #ffffff;
+    --shadow: 0 10px 30px rgba(0,0,0,0.08);
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+html { scroll-behavior: smooth; }
 
 * {
     margin: 0;
@@ -20,13 +25,28 @@ body {
     font-family: 'Inter', sans-serif;
     background-color: var(--light);
     color: var(--dark);
+    line-height: 1.6;
+    overflow-x: hidden;
 }
 
-/* NAVBAR MODERNA */
+/* 2. ANIMACIONES GLOBALES */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 204, 0, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
+}
+
+/* 3. NAVBAR (Glassmorphism) */
 .navbar {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 1.2rem 8%;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 1rem 8%;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -34,49 +54,53 @@ body {
     width: 100%;
     top: 0;
     z-index: 1000;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    transition: var(--transition);
 }
 
-.logo {
-    font-weight: 800;
-    font-size: 1.5rem;
-    color: var(--primary);
+.logo { font-weight: 800; font-size: 1.5rem; color: var(--primary); cursor: default; }
+
+.nav-links { display: flex; list-style: none; gap: 30px; align-items: center; }
+
+.nav-links a { 
+    text-decoration: none; 
+    color: var(--dark); 
+    font-weight: 500; 
+    font-size: 0.95rem; 
+    transition: var(--transition);
+    position: relative;
 }
 
-.nav-links {
-    display: flex;
-    list-style: none;
-    gap: 30px;
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    width: 0; height: 2px;
+    bottom: -5px; left: 0;
+    background-color: var(--primary);
+    transition: var(--transition);
 }
 
-.nav-links a {
-    text-decoration: none;
-    color: var(--dark);
-    font-weight: 500;
-    font-size: 0.95rem;
-    transition: 0.3s;
-}
-
-.nav-links a:hover {
-    color: var(--primary);
-}
+.nav-links a:hover::after { width: 100%; }
 
 .btn-login {
     background: var(--primary);
     color: white !important;
-    padding: 10px 22px;
+    padding: 10px 25px;
     border-radius: 50px;
     font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 74, 153, 0.3);
 }
 
-/* HERO SECTION (Donde usamos tu imagen) */
+.btn-login:hover { transform: translateY(-2px); background: var(--primary-dark); }
+
+/* 4. HERO SECTION (Página de Inicio) */
 .hero {
-    height: 90vh;
-    /* Las imágenes se ponen aquí, NO en el @import de arriba */
-    background: linear-gradient(135deg, rgba(0,74,153,0.8), rgba(76,175,80,0.7)), 
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(0,74,153,0.7), rgba(76,175,80,0.6)), 
                 url('portada-web-362.png'); 
     background-size: cover;
     background-position: center;
+    background-attachment: fixed; /* Efecto Parallax suave */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -86,282 +110,141 @@ body {
     padding: 0 20px;
 }
 
-.hero h1 {
-    font-size: 4rem;
-    font-weight: 800;
-    max-width: 800px;
-    margin-bottom: 20px;
-    line-height: 1.1;
-}
+.hero-content { animation: fadeInUp 1s ease-out; }
 
-.hero p {
-    font-size: 1.2rem;
-    max-width: 600px;
-    margin-bottom: 40px;
-    opacity: 0.9;
-}
+.hero h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; margin-bottom: 20px; }
+
+.hero p { font-size: 1.2rem; max-width: 600px; margin-bottom: 40px; opacity: 0.9; }
 
 .btn-cta {
     background: var(--accent);
     color: var(--dark);
-    padding: 18px 40px;
+    padding: 20px 45px;
     border-radius: 50px;
-    font-weight: 700;
+    font-weight: 800;
     text-decoration: none;
-    transition: 0.3s;
-    box-shadow: 0 10px 20px rgba(255, 204, 0, 0.3);
+    display: inline-block;
+    animation: pulse 2s infinite;
+    transition: var(--transition);
 }
 
-.btn-cta:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 25px rgba(255, 204, 0, 0.4);
-}
+/* 5. SECCIONES (Cards Manada/Tropa) */
+.secciones-container { padding: 100px 10%; animation: fadeInUp 1s ease-out; }
 
-/* SECCIONES (CARDS) */
-.secciones-container {
-    padding: 100px 10%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.grid-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 40px;
-}
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
 
 .card {
     background: var(--white);
-    padding: 40px;
-    border-radius: 24px;
-    border: 1px solid rgba(0,0,0,0.03);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 50px 40px;
+    border-radius: 30px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    border: 1px solid rgba(0,0,0,0.02);
+    text-align: center;
 }
 
-.card:hover {
-    transform: translateY(-12px);
+.card:hover { 
+    transform: translateY(-15px); 
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border-color: var(--secondary);
 }
 
-.card h3 {
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-}
-
-.card p {
-    color: #64748b;
-    margin-bottom: 25px;
-}
-
-/* LOGIN */
+/* 6. LOGIN PAGE */
 .login-body {
-    background: linear-gradient(135deg, #004a99, #4caf50);
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.login-container {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-}
-
 .login-box {
     background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    text-align: center;
-}
-
-.back-link {
-    display: block;
-    text-align: left;
-    margin-bottom: 20px;
-    color: #64748b;
-    text-decoration: none;
-    font-size: 0.9rem;
-}
-
-.input-group {
-    text-align: left;
-    margin-bottom: 20px;
-}
-
-.input-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    font-size: 0.9rem;
+    padding: 50px;
+    border-radius: 30px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    width: 90%;
+    max-width: 450px;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 .input-group input {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    transition: var(--transition);
     outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(0, 74, 153, 0.1);
 }
 
 .btn-login-submit {
     width: 100%;
-    background: #004a99;
+    background: var(--primary);
     color: white;
-    padding: 12px;
+    padding: 15px;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-weight: 700;
     cursor: pointer;
-    transition: 0.3s;
+    transition: var(--transition);
 }
 
-.btn-login-submit:hover {
-    background: #003366;
-}
-/* MEJORAS DEL DASHBOARD */
-.dashboard-body {
-    background-color: #f8fafc;
-}
+/* 7. DASHBOARD (Panel de Control) */
+.dashboard-container { padding: 130px 8% 50px; animation: fadeInUp 0.8s ease-out; }
 
-.dashboard-container {
-    padding: 120px 8% 50px;
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.dashboard-header h1 {
-    font-size: 2rem;
-    color: var(--dark);
-}
-
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 25px;
-    margin-top: 30px;
-}
-
-/* ESTILO DE LAS TARJETAS (WIDGETS) */
-.dash-card {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-    border: 1px solid #f1f5f9;
-    position: relative;
-    transition: 0.3s;
-}
-
-.dash-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-}
-
-/* ICONOS DE LAS TARJETAS */
-.card-icon {
-    width: 45px;
-    height: 45px;
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.card-icon.blue { background: #e0f2fe; color: #0284c7; }
-.card-icon.yellow { background: #fef9c3; color: #ca8a04; }
-.card-icon.green { background: #dcfce7; color: #16a34a; }
-.card-icon.red { background: #fee2e2; color: #dc2626; }
-
-/* BARRA DE PROGRESO LLAMATIVA */
-.progress-info {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    margin-top: 20px;
-    font-weight: 600;
-    color: #64748b;
+.puntos-badge {
+    background: var(--accent);
+    padding: 15px 30px;
+    border-radius: 100px;
+    font-weight: 900;
+    box-shadow: 0 8px 20px rgba(255, 204, 0, 0.4);
 }
 
 .progress-bar-container {
-    background: #f1f5f9;
-    height: 14px;
-    border-radius: 20px;
-    margin-top: 8px;
+    background: #e2e8f0;
+    height: 20px;
+    border-radius: 50px;
+    margin: 20px 0;
     overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .progress-fill {
     height: 100%;
-    border-radius: 20px;
-    background: linear-gradient(90deg, #4caf50, #81c784);
-    box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
-}
-
-/* Efecto de brillo animado */
-.animated-glow {
+    background: linear-gradient(90deg, #4caf50, #81c784, #4caf50);
+    background-size: 200% 100%;
+    animation: moveGradient 3s linear infinite;
     position: relative;
-    overflow: hidden;
 }
 
-.animated-glow::after {
+@keyframes moveGradient {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Efecto de brillo que cruza */
+.progress-fill::after {
     content: '';
     position: absolute;
     top: 0; left: -100%;
     width: 100%; height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    animation: scan 3s infinite;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+    animation: scan 2s infinite;
 }
 
 @keyframes scan {
+    0% { left: -100%; }
     100% { left: 100%; }
 }
 
-/* ELEMENTOS EXTRA */
 .badge-item {
-    width: 50px; height: 50px;
-    background: #f8fafc;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    border: 2px dashed #e2e8f0;
+    transition: var(--transition);
+    cursor: help;
 }
 
-.badge-item.empty { color: #cbd5e1; font-size: 1rem; }
-
-.event-date { font-weight: 800; color: var(--primary); margin-top: 10px; }
-.message-text { font-style: italic; color: #475569; border-left: 3px solid var(--accent); padding-left: 10px; }
-
-/* LA BARRA DE PROGRESO (Ingeniería visual) */
-.progress-bar-container {
-    background: #e2e8f0;
-    height: 12px;
-    border-radius: 10px;
-    margin-top: 15px;
-    overflow: hidden; /* Para que el relleno no se salga de las esquinas */
-}
-
-.progress-fill {
-    background: var(--secondary); /* El verde scout */
-    height: 100%;
-    border-radius: 10px;
-    transition: width 1s ease-in-out; /* Para que la barra "crezca" suavemente */
-}
-
-.badges-row {
-    font-size: 2rem;
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.logout-link {
-    color: #ef4444; /* Rojo para advertir salida */
-    text-decoration: none;
-    font-weight: 600;
-}
+.badge-item:hover { transform: scale(1.2) rotate(10deg); filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); }
