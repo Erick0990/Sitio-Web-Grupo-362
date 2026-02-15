@@ -221,45 +221,121 @@ body {
 .btn-login-submit:hover {
     background: #003366;
 }
-/* ESTILOS DEL DASHBOARD */
+/* MEJORAS DEL DASHBOARD */
 .dashboard-body {
-    background-color: #f1f5f9;
+    background-color: #f8fafc;
 }
 
 .dashboard-container {
-    padding: 120px 8% 50px; /* Más espacio arriba por la navbar fija */
-    max-width: 1000px;
+    padding: 120px 8% 50px;
+    max-width: 1100px;
     margin: 0 auto;
 }
 
-.dashboard-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.puntos-badge {
-    background: var(--accent);
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: 800;
-    font-size: 1.2rem;
+.dashboard-header h1 {
+    font-size: 2rem;
     color: var(--dark);
 }
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 25px;
+    margin-top: 30px;
 }
 
+/* ESTILO DE LAS TARJETAS (WIDGETS) */
 .dash-card {
     background: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+    border: 1px solid #f1f5f9;
+    position: relative;
+    transition: 0.3s;
 }
+
+.dash-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* ICONOS DE LAS TARJETAS */
+.card-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-icon.blue { background: #e0f2fe; color: #0284c7; }
+.card-icon.yellow { background: #fef9c3; color: #ca8a04; }
+.card-icon.green { background: #dcfce7; color: #16a34a; }
+.card-icon.red { background: #fee2e2; color: #dc2626; }
+
+/* BARRA DE PROGRESO LLAMATIVA */
+.progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    margin-top: 20px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.progress-bar-container {
+    background: #f1f5f9;
+    height: 14px;
+    border-radius: 20px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #4caf50, #81c784);
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.4);
+}
+
+/* Efecto de brillo animado */
+.animated-glow {
+    position: relative;
+    overflow: hidden;
+}
+
+.animated-glow::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: scan 3s infinite;
+}
+
+@keyframes scan {
+    100% { left: 100%; }
+}
+
+/* ELEMENTOS EXTRA */
+.badge-item {
+    width: 50px; height: 50px;
+    background: #f8fafc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    border: 2px dashed #e2e8f0;
+}
+
+.badge-item.empty { color: #cbd5e1; font-size: 1rem; }
+
+.event-date { font-weight: 800; color: var(--primary); margin-top: 10px; }
+.message-text { font-style: italic; color: #475569; border-left: 3px solid var(--accent); padding-left: 10px; }
 
 /* LA BARRA DE PROGRESO (Ingeniería visual) */
 .progress-bar-container {
