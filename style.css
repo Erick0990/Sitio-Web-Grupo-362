@@ -89,9 +89,8 @@ body {
     border-radius: 50px;
     font-weight: 600;
     box-shadow: 0 4px 15px rgba(0, 74, 153, 0.3);
+    text-decoration: none;
 }
-
-.btn-login:hover { transform: translateY(-2px); background: var(--primary-dark); }
 
 /* 4. HERO SECTION (Página de Inicio) */
 .hero {
@@ -100,7 +99,7 @@ body {
                 url('portada-web-362.png'); 
     background-size: cover;
     background-position: center;
-    background-attachment: fixed; /* Efecto Parallax suave */
+    background-attachment: fixed;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -110,11 +109,7 @@ body {
     padding: 0 20px;
 }
 
-.hero-content { animation: fadeInUp 1s ease-out; }
-
-.hero h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; margin-bottom: 20px; }
-
-.hero p { font-size: 1.2rem; max-width: 600px; margin-bottom: 40px; opacity: 0.9; }
+.hero h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); font-weight: 800; margin-bottom: 20px; animation: fadeInUp 1s ease-out; }
 
 .btn-cta {
     background: var(--accent);
@@ -125,29 +120,20 @@ body {
     text-decoration: none;
     display: inline-block;
     animation: pulse 2s infinite;
-    transition: var(--transition);
 }
 
 /* 5. SECCIONES (Cards Manada/Tropa) */
-.secciones-container { padding: 100px 10%; animation: fadeInUp 1s ease-out; }
-
+.secciones-container { padding: 100px 10%; }
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
-
 .card {
     background: var(--white);
     padding: 50px 40px;
     border-radius: 30px;
     box-shadow: var(--shadow);
     transition: var(--transition);
-    border: 1px solid rgba(0,0,0,0.02);
     text-align: center;
 }
-
-.card:hover { 
-    transform: translateY(-15px); 
-    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    border-color: var(--secondary);
-}
+.card:hover { transform: translateY(-15px); border-color: var(--secondary); }
 
 /* 6. LOGIN PAGE */
 .login-body {
@@ -165,51 +151,28 @@ body {
     box-shadow: 0 20px 50px rgba(0,0,0,0.3);
     width: 90%;
     max-width: 450px;
-    animation: fadeInUp 0.6s ease-out;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 15px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    transition: var(--transition);
-    outline: none;
-}
-
-.input-group input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 4px rgba(0, 74, 153, 0.1);
 }
 
 .btn-login-submit {
-    display: block;          /* Ocupa todo el ancho disponible */
-    width: 100%;             /* Se estira al ancho de la caja */
+    display: block;
+    width: 100%;
     background: var(--primary);
-    color: white !important; /* Forzamos el blanco para que no se vea azul link */
+    color: white !important;
     padding: 16px;
     border-radius: 12px;
     font-weight: 700;
-    font-size: 1rem;
     text-align: center;
-    text-decoration: none;   /* ¡Adiós a la línea azul de link! */
+    text-decoration: none;
     transition: var(--transition);
     box-shadow: 0 4px 12px rgba(0, 74, 153, 0.2);
     border: none;
-    cursor: pointer;
     margin-top: 10px;
 }
 
 .btn-login-submit:hover {
     background: var(--primary-dark);
-    transform: translateY(-2px); /* Se eleva un poquito */
+    transform: translateY(-2px);
     box-shadow: 0 8px 20px rgba(0, 74, 153, 0.3);
-}
-
-.btn-login-submit:active {
-    transform: translateY(0);    /* Efecto de que se "hunde" al darle clic */
-    box-shadow: 0 2px 5px rgba(0, 74, 153, 0.2);
-}
 }
 
 /* 7. DASHBOARD (Panel de Control) */
@@ -220,7 +183,15 @@ body {
     padding: 15px 30px;
     border-radius: 100px;
     font-weight: 900;
-    box-shadow: 0 8px 20px rgba(255, 204, 0, 0.4);
+    display: inline-block;
+}
+
+.dash-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    margin-top: 20px;
 }
 
 .progress-bar-container {
@@ -229,7 +200,7 @@ body {
     border-radius: 50px;
     margin: 20px 0;
     overflow: hidden;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
 }
 
 .progress-fill {
@@ -238,6 +209,7 @@ body {
     background-size: 200% 100%;
     animation: moveGradient 3s linear infinite;
     position: relative;
+    width: 75%; /* Ajuste manual del progreso */
 }
 
 @keyframes moveGradient {
@@ -245,7 +217,6 @@ body {
     100% { background-position: -200% 0; }
 }
 
-/* Efecto de brillo que cruza */
 .progress-fill::after {
     content: '';
     position: absolute;
@@ -259,18 +230,17 @@ body {
     0% { left: -100%; }
     100% { left: 100%; }
 }
-/* --- CORRECCIÓN DE INSIGNIAS (Sin rebote) --- */
+
+/* 8. INSIGNIAS (Efecto Suave) */
 .badges-row {
     display: flex;
     gap: 15px;
     margin-top: 20px;
     flex-wrap: wrap;
-    justify-content: center; /* Centra las insignias si hay pocas */
 }
 
 .badge-item {
-    width: 60px;
-    height: 60px;
+    width: 60px; height: 60px;
     background: #f8fafc;
     border-radius: 50%;
     display: flex;
@@ -278,23 +248,16 @@ body {
     align-items: center;
     font-size: 1.8rem;
     border: 2px dashed #e2e8f0;
-    cursor: help;
-    /* Usamos 'ease-out' para que sea suave y NO rebote */
-    transition: transform 0.2s ease-out, background 0.2s ease, border-color 0.2s ease;
-    will-change: transform; /* Le avisa al navegador que se va a mover para que lo haga fluido */
+    transition: transform 0.2s ease-out, background 0.2s ease;
+    will-change: transform;
 }
 
 .badge-item:hover {
-    /* Quitamos la rotación brusca, solo sube un poquito y se agranda suave */
-    transform: translateY(-8px) scale(1.1); 
+    transform: translateY(-8px) scale(1.1);
     background: white;
     border-color: var(--accent);
-    border-style: solid; /* Pasa de guiones a línea sólida al tocarla */
+    border-style: solid;
     filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
-    z-index: 10; /* Se pone por encima de las demás */
 }
 
-.badge-item.empty {
-    opacity: 0.5;
-    cursor: default;
-}
+.logout-link { color: #ef4444; text-decoration: none; font-weight: 700; margin-left: 20px; }
