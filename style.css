@@ -242,9 +242,42 @@ body {
     100% { left: 100%; }
 }
 
-.badge-item {
-    transition: var(--transition);
-    cursor: help;
+/* --- CORRECCIÓN DE INSIGNIAS (Sin rebote) --- */
+.badges-row {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+    justify-content: center; /* Centra las insignias si hay pocas */
 }
 
-.badge-item:hover { transform: scale(1.2) rotate(10deg); filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); }
+.badge-item {
+    width: 60px;
+    height: 60px;
+    background: #f8fafc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8rem;
+    border: 2px dashed #e2e8f0;
+    cursor: help;
+    /* Usamos 'ease-out' para que sea suave y NO rebote */
+    transition: transform 0.2s ease-out, background 0.2s ease, border-color 0.2s ease;
+    will-change: transform; /* Le avisa al navegador que se va a mover para que lo haga fluido */
+}
+
+.badge-item:hover {
+    /* Quitamos la rotación brusca, solo sube un poquito y se agranda suave */
+    transform: translateY(-8px) scale(1.1); 
+    background: white;
+    border-color: var(--accent);
+    border-style: solid; /* Pasa de guiones a línea sólida al tocarla */
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+    z-index: 10; /* Se pone por encima de las demás */
+}
+
+.badge-item.empty {
+    opacity: 0.5;
+    cursor: default;
+}
