@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grupo 362 - Cervantes</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -14,8 +14,8 @@
         <ul class="nav-links">
             <li><a href="#inicio">Inicio</a></li>
             <li><a href="#secciones">Secciones</a></li>
-            <li><a href="login.html">Padres</a></li>
-            <li><a href="login.html" class="btn-login">Administración</a></li>
+            <li><a href="login.html" style="font-weight: 700;">Portal Padres</a></li>
+            <li><a href="login.html" class="btn-admin">Administración</a></li>
         </ul>
     </nav>
 
@@ -23,26 +23,38 @@
         <div class="hero-content">
             <h1>¡Siempre Listos Para Servir!</h1>
             <p>Únete a la gran familia de Guías y Scouts en Cervantes. Aventura, valores y amigos para toda la vida.</p>
-            <button class="btn-cta">¡Inscríbete Ahora!</button>
+            <a href="#secciones" class="btn-cta">¡Inscríbete Ahora!</a>
         </div>
     </header>
 
     <section id="secciones" class="secciones-container">
-        <h2>Nuestras Secciones</h2>
+        <h2 style="text-align: center; margin-bottom: 50px; font-size: 2.5rem; color: var(--primary);">Nuestras Secciones</h2>
+        
         <div class="grid-cards">
-            <div class="card amarillo">
-                <h3>🐺 Manada</h3>
-                <p>Para niños y niñas de 6 a 10 años. ¡Aprende jugando!</p>
+            
+            <div class="card manada">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🐺</div>
+                <h3>Manada de Lobatos</h3>
+                <p>Para niños y niñas de 7 a 11 años. ¡Aprende jugando en la selva del Seeonee!</p>
             </div>
-            <div class="card verde">
-                <h3>🏕️ Tropa</h3>
-                <p>De 11 a 14 años. La aventura al aire libre te espera.</p>
+            
+            <div class="card tropa">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🏕️</div>
+                <h3>Tropa Scout</h3>
+                <p>De 11 a 15 años. La aventura al aire libre, campamentos y patrullas te esperan.</p>
             </div>
+
+            <div class="card" style="border-top: 8px solid #ef4444;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🔥</div>
+                <h3>Comunidad / Wak</h3>
+                <p>Jóvenes líderes listos para el servicio y el desafío de rovers.</p>
+            </div>
+
         </div>
     </section>
 
-    <footer>
-        <p>Grupo 362 Cervantes - Guías y Scouts de Costa Rica &copy; 2026</p>
+    <footer style="text-align: center; padding: 40px; background: var(--dark); color: white; margin-top: 50px;">
+        <p style="opacity: 0.7;">Grupo 362 Cervantes - Guías y Scouts de Costa Rica &copy; 2026</p>
     </footer>
 
 </body>
