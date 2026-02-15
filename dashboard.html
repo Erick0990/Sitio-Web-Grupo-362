@@ -19,63 +19,67 @@
         <a href="index.html" class="logout-link">Cerrar Sesión</a>
     </nav>
 
-    <main class="dashboard-container">
+   <main class="dashboard-wrapper">
+    <div class="dashboard-container">
         
         <header class="dashboard-header">
-            <div>
+            <div class="welcome-text">
                 <h1>Mi Progresión</h1>
-                <p>Unidad: Manada de Lobatos</p>
+                <p>Manada de Lobatos - Grupo 362</p>
             </div>
             <div class="puntos-badge">
-                <span class="material-symbols-outlined">stars</span>
-                550 pts
+                <span class="star-icon">⭐</span> 550 pts
             </div>
         </header>
 
+        <section class="dash-card main-progress">
+            <h3>Nivel Actual: Akela</h3>
+            <div class="progress-bar-container">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="progress-labels">
+                <span>75% completado</span>
+                <span>Faltan 250 pts para el siguiente nivel</span>
+            </div>
+        </section>
+
         <div class="dashboard-grid">
             
-            <div class="dash-card featured">
-                <div class="card-icon blue"><span class="material-symbols-outlined">trending_up</span></div>
-                <h3>Etapa de Progresión</h3>
-                <p>Etapa actual: <strong>Akela</strong></p>
-                
-                <div class="progress-info">
-                    <span>Progreso al 75%</span>
-                    <span>750 / 1000 pts</span>
+            <div class="dash-card interactive">
+                <div class="card-header">
+                    <span class="icon">🎖️</span>
+                    <h3>Mis Insignias</h3>
                 </div>
-                <div class="progress-bar-container">
-                    <div class="progress-fill animated-glow" style="width: 75%;"></div>
-                </div>
-            </div>
-
-            <div class="dash-card">
-                <div class="card-icon yellow"><span class="material-symbols-outlined">military_tech</span></div>
-                <h3>Mis Insignias</h3>
                 <div class="badges-row">
                     <div class="badge-item">🌲</div>
                     <div class="badge-item">🩹</div>
                     <div class="badge-item">🪢</div>
-                    <div class="badge-item empty">+</div>
                 </div>
             </div>
 
-            <div class="dash-card">
-                <div class="card-icon green"><span class="material-symbols-outlined">event</span></div>
-                <h3>Próxima Actividad</h3>
-                <div class="event-info">
-                    <p class="event-date">Sábado 21 de Febrero</p>
-                    <p class="event-desc">Acantonamiento en el TEC</p>
+            <div class="dash-card interactive">
+                <div class="card-header">
+                    <span class="icon">📅</span>
+                    <h3>Próxima Actividad</h3>
+                </div>
+                <div class="activity-content">
+                    <p class="date">Sábado 21 de Feb</p>
+                    <p class="desc">Acantonamiento en el TEC</p>
                 </div>
             </div>
 
-            <div class="dash-card">
-                <div class="card-icon red"><span class="material-symbols-outlined">campaign</span></div>
-                <h3>Avisos de Jefatura</h3>
-                <p class="message-text">"No olviden traer el uniforme completo para la inspección." - Akela</p>
+            <div class="dash-card interactive aviso-jefatura">
+                <div class="card-header">
+                    <span class="icon">📢</span>
+                    <h3>Avisos de Jefatura</h3>
+                </div>
+                <p class="quote">"No olviden traer el uniforme completo para la inspección."</p>
+                <span class="author">- Akela</span>
             </div>
 
         </div>
-    </main>
+    </div>
+</main>
 
 </body>
 </html>
