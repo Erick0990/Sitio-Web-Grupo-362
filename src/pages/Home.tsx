@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 
 export const Home = () => {
   return (
-    <MainLayout paddingTop={false}>
+    <MainLayout paddingTop={true}>
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center text-center text-white overflow-hidden">
         {/* Background Image with Overlay */}
@@ -53,24 +53,18 @@ export const Home = () => {
         <div className="container mx-auto px-6">
           <h2 className="text-4xl md:text-5xl font-black text-center mb-16 text-primary tracking-tight">Nuestras Secciones</h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10 max-w-4xl mx-auto">
             <SectionCard 
               title="Manada de Lobatos" 
-              description="Para niños y niñas de 7 a 11 años. ¡Aprende jugando en la selva del Seeonee!"
+              description="Para niños y niñas de 6 a 10 años. ¡Aprende jugando en la selva del Seeonee!"
               icon="🐺"
               variant="manada"
             />
             <SectionCard 
               title="Tropa Scout" 
-              description="De 11 a 15 años. La aventura al aire libre, campamentos y patrullas te esperan."
+              description="Para jóvenes de 11 a 14 años. La aventura al aire libre, campamentos y patrullas te esperan."
               icon="🏕️"
               variant="tropa"
-            />
-             <SectionCard 
-              title="Comunidad / Wak" 
-              description="Jóvenes líderes listos para el servicio y el desafío de rovers."
-              icon="🔥"
-              variant="comunidad"
             />
           </div>
         </div>

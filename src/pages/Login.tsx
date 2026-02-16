@@ -1,27 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/atoms/Button';
 import { Input } from '../components/atoms/Input';
 import { MainLayout } from '../components/templates/MainLayout';
-import { useSearchParams, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login } = useAuth();
+  const { login, user, role, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [searchParams] = useSearchParams();
-  const isAdmin = searchParams.get('role') === 'admin';
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!loading && user && role) {
+      if (role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [user, role, loading, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setIsSubmitting(true);
+
     if (!email || !password) {
       setError('Por favor, completa todos los campos.');
+      setIsSubmitting(false);
       return;
     }
-    // Mock validation
-    login(email, isAdmin ? 'admin' : 'user');
+
+    const { error: authError } = await login(email, password);
+
+    if (authError) {
+      setError('Credenciales inválidas o error en el servidor.');
+      setIsSubmitting(false);
+    }
+    // If success, the useEffect above will handle redirection
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <MainLayout showNavbar={false} showFooter={false} className="flex items-center justify-center min-h-screen bg-gradient-to-br from-primary to-secondary p-6" paddingTop={false}>
@@ -29,8 +57,8 @@ export const Login = () => {
         <Link to="/" className="inline-block mb-6 text-gray-400 hover:text-primary transition-colors text-sm font-semibold">
           ← Volver al inicio
         </Link>
-        <h2 className={`text-3xl font-bold mb-2 text-center ${isAdmin ? 'text-green-600' : 'text-primary'}`}>
-          {isAdmin ? 'Portal Administrativo' : 'Portal Grupo 362'}
+        <h2 className="text-3xl font-bold mb-2 text-center text-primary">
+          Portal Grupo 362
         </h2>
         <p className="text-gray-500 text-center mb-8">Ingresa tus credenciales para continuar</p>
         
@@ -54,10 +82,11 @@ export const Login = () => {
           <Button 
             type="submit" 
             fullWidth 
-            variant={isAdmin ? 'admin' : 'primary'}
+            variant="primary"
             size="lg"
+            disabled={isSubmitting}
           >
-            Entrar al Sistema
+            {isSubmitting ? 'Verificando...' : 'Entrar al Sistema'}
           </Button>
         </form>
 

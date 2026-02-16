@@ -11,7 +11,7 @@ interface SectionCardProps {
   title: string;
   description: string;
   icon: ReactNode;
-  variant?: 'manada' | 'tropa' | 'comunidad';
+  variant?: 'manada' | 'tropa';
   className?: string;
   onClick?: () => void;
 }
@@ -27,13 +27,11 @@ export const SectionCard = ({
   const variantStyles = {
     manada: 'border-accent shadow-[0_10px_30px_rgba(255,204,0,0.1)] hover:shadow-[0_25px_50px_rgba(255,204,0,0.2)]',
     tropa: 'border-secondary shadow-[0_10px_30px_rgba(76,175,80,0.1)] hover:shadow-[0_25px_50px_rgba(76,175,80,0.2)]',
-    comunidad: 'border-red-500 shadow-[0_10px_30px_rgba(239,68,68,0.1)] hover:shadow-[0_25px_50px_rgba(239,68,68,0.2)]',
   };
 
   const bgStyles = {
     manada: 'bg-accent',
     tropa: 'bg-secondary',
-    comunidad: 'bg-red-500',
   };
 
   return (
