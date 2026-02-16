@@ -7,7 +7,7 @@ function cn(...inputs: ClassValue[]) {
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'accent' | 'admin' | 'outline' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'accent' | 'admin' | 'outline' | 'ghost' | 'destructive';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
   children: ReactNode;
@@ -35,6 +35,7 @@ export const Button = ({
     admin: 'bg-admin-green text-green-900 hover:bg-admin-hover hover:text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 hover:scale-105',
     outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white',
     ghost: 'text-gray-600 hover:text-primary hover:bg-gray-100',
+    destructive: 'bg-red-600 text-white hover:bg-red-700 shadow-lg hover:shadow-xl hover:-translate-y-0.5',
   };
 
   const sizes = {
