@@ -34,12 +34,8 @@ export const Navbar = () => {
           <NavLink to="/">Inicio</NavLink>
           <NavLink to="#secciones">Secciones</NavLink>
           <div className="flex gap-4">
-            <Link to="/login">
-              <Button variant="primary" size="sm">Portal Padres</Button>
-            </Link>
-            <Link to="/login?role=admin">
-              <Button variant="admin" size="sm">Administración</Button>
-            </Link>
+            <Button as={Link} to="/login" variant="primary" size="sm">Portal Padres</Button>
+            <Button as={Link} to="/login?role=admin" variant="admin" size="sm">Administración</Button>
           </div>
         </div>
 
@@ -64,12 +60,8 @@ export const Navbar = () => {
             <div className="flex flex-col p-6 gap-4 items-center">
               <NavLink to="/">Inicio</NavLink>
               <NavLink to="#secciones">Secciones</NavLink>
-              <Link to="/login" className="w-full">
-                <Button variant="primary" fullWidth>Portal Padres</Button>
-              </Link>
-              <Link to="/login?role=admin" className="w-full">
-                <Button variant="admin" fullWidth>Administración</Button>
-              </Link>
+              <Button as={Link} to="/login" variant="primary" fullWidth>Portal Padres</Button>
+              <Button as={Link} to="/login?role=admin" variant="admin" fullWidth>Administración</Button>
             </div>
           </motion.div>
         )}

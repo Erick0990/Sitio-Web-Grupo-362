@@ -1,7 +1,6 @@
-import { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode, ElementType } from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { motion } from 'framer-motion';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -13,8 +12,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
   children: ReactNode;
   className?: string;
-  as?: any; // For router Link or other components
-  to?: string; // For router Link
+  as?: ElementType; 
+  to?: string; 
+  href?: string;
 }
 
 export const Button = ({
