@@ -1,4 +1,5 @@
 -- Comprehensive Authentication Fix (Trigger, Backfill, RLS)
+-- This script is idempotent: it drops existing objects before creating them to avoid conflicts.
 
 -- 1. Function to handle new user signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -40,12 +41,16 @@ WHERE email = 'erickgonzalezmatarrita@hotmail.com';
 -- 5. RLS Policies
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
--- Drop potentially conflicting policies
+-- Drop ALL potentially conflicting policies to start fresh
 DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
 DROP POLICY IF EXISTS "Admins can do everything" ON public.profiles;
 DROP POLICY IF EXISTS "Public profiles are viewable by everyone." ON public.profiles;
 DROP POLICY IF EXISTS "Users can insert their own profile." ON public.profiles;
 DROP POLICY IF EXISTS "Users can update own profile." ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles; -- Catch variations
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Enable insert for authenticated users only" ON public.profiles;
+DROP POLICY IF EXISTS "Enable read access for all users" ON public.profiles;
 
 -- Create robust policies
 CREATE POLICY "Users can view own profile"
