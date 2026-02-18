@@ -9,7 +9,7 @@ export const Login = () => {
   const { login, logout, user, role, loading, error: authContextError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [localError, setLocalError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -22,51 +22,42 @@ export const Login = () => {
         navigate('/dashboard');
       }
     }
-
-    // Handle case where user is authenticated but role fetch failed
-    if (!loading) {
-      if (authContextError) {
-        setError(authContextError);
-        setIsSubmitting(false);
-      } else if (user && !role) {
-        // This case should ideally be handled by AuthContext setting error, but as a fallback:
-        // If we have a user but no role and no error yet, wait or show generic error
-        // But AuthContext sets error if timeout.
-      }
-
-      // Reset submitting state if loading finishes
-      setIsSubmitting(false);
-    }
-  }, [user, role, loading, navigate, authContextError]);
+    // We removed the synchronous state updates here to avoid linter errors and cascading renders.
+    // The error display is now handled directly in the render method.
+  }, [user, role, loading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setLocalError('');
     setIsSubmitting(true);
 
     if (!email || !password) {
-      setError('Por favor, completa todos los campos.');
+      setLocalError('Por favor, completa todos los campos.');
       setIsSubmitting(false);
       return;
     }
 
-    const { error: authError } = await login(email, password);
+    try {
+      const { error: authError } = await login(email, password);
 
-    if (authError) {
-      setError('Credenciales inválidas o error en el servidor.');
+      if (authError) {
+        setLocalError('Credenciales inválidas o error en el servidor.');
+        setIsSubmitting(false);
+      } else {
+        // Login successful, AuthContext will handle state updates and redirection via useEffect
+        // We can leave isSubmitting true until unmount or redirection
+      }
+    } catch {
+      setLocalError('Ocurrió un error inesperado.');
       setIsSubmitting(false);
     }
-    // If success, the useEffect above will handle redirection or error showing
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        <span className="ml-3 text-primary font-medium">Verificando credenciales...</span>
-      </div>
-    );
-  }
+  // Combine local validation errors with auth context errors
+  const displayError = localError || authContextError;
+
+  // Disable button if submitting locally or if global loading is active
+  const isButtonDisabled = isSubmitting || loading;
 
   return (
     <MainLayout showNavbar={false} showFooter={false} className="flex items-center justify-center min-h-screen bg-gradient-to-br from-primary to-secondary p-6" paddingTop={false}>
@@ -79,14 +70,14 @@ export const Login = () => {
         </h2>
         <p className="text-gray-500 text-center mb-8">Ingresa tus credenciales para continuar</p>
         
-        {error && (
+        {displayError && (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 text-sm text-center border border-red-200 shadow-sm animate-pulse">
-            <p className="font-medium mb-2">{error}</p>
+            <p className="font-medium mb-2">{displayError}</p>
             {user && (
               <button
                 onClick={() => {
                   logout();
-                  setError('');
+                  setLocalError('');
                 }}
                 className="text-primary hover:text-primary-dark font-bold underline hover:no-underline transition-all text-xs uppercase tracking-wider cursor-pointer"
               >
@@ -116,9 +107,9 @@ export const Login = () => {
             fullWidth 
             variant="primary"
             size="lg"
-            disabled={isSubmitting}
+            disabled={isButtonDisabled}
           >
-            {isSubmitting ? 'Verificando...' : 'Entrar al Sistema'}
+            {isButtonDisabled ? 'Verificando...' : 'Entrar al Sistema'}
           </Button>
         </form>
 
