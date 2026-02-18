@@ -4,6 +4,7 @@ import { MainLayout } from '../components/templates/MainLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { formatRelativeTime } from '../utils/formatDate';
 import { useAnuncios } from '../hooks/useAnuncios';
+import { MyScouts } from '../components/dashboard/MyScouts';
 
 export const ParentDashboard = () => {
   const { user, logout } = useAuth();
@@ -33,6 +34,11 @@ export const ParentDashboard = () => {
             <Button onClick={logout} variant="outline" size="sm" className="relative z-10">
               Cerrar Sesión
             </Button>
+          </div>
+
+          {/* My Scouts Section */}
+          <div className="mb-8">
+            <MyScouts />
           </div>
 
           {/* Announcements Section */}
