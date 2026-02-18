@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/atoms/Button';
 import { Input } from '../components/atoms/Input';
@@ -7,46 +7,17 @@ import { MainLayout } from '../components/templates/MainLayout';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabaseClient';
 import { formatRelativeTime } from '../utils/formatDate';
-
-interface Anuncio {
-  id: string;
-  titulo: string;
-  contenido: string;
-  fecha_publicacion: string;
-  user_id: string;
-}
+import { useAnuncios } from '../hooks/useAnuncios';
 
 export const AdminDashboard = () => {
   const { user, logout } = useAuth();
-  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { anuncios, loading, refetch, setAnuncios } = useAnuncios();
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     titulo: '',
     contenido: ''
   });
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchAnuncios();
-  }, []);
-
-  const fetchAnuncios = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
-        .from('anuncios')
-        .select('*')
-        .order('fecha_publicacion', { ascending: false });
-
-      if (error) throw error;
-      setAnuncios(data || []);
-    } catch (err) {
-      console.error('Error fetching anuncios:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -77,7 +48,7 @@ export const AdminDashboard = () => {
       if (error) throw error;
 
       setFormData({ titulo: '', contenido: '' });
-      fetchAnuncios();
+      refetch();
     } catch (err) {
       console.error('Error creating anuncio:', err);
       setError('Error al publicar el anuncio');
