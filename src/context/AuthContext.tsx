@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [role, setRole] = useState<'admin' | 'parent' | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchRole = useCallback(async (userId: string) => {
+  const fetchRole = useCallback(async (userId: string, retryCount = 0) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -29,12 +29,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .single();
 
       if (error) {
-        console.error('Error fetching role:', error);
+        // If error is PGRST116 (JSON object requested, multiple (or no) rows returned), it usually means no profile found.
+        console.warn(`Attempt ${retryCount + 1}: Error fetching role:`, error.message);
       }
 
       if (data) {
         setRole(data.role as 'admin' | 'parent');
+        return; // Success
       }
+
+      // Retry logic if no data found or error occurred
+      const maxRetries = 5;
+      if (retryCount < maxRetries) {
+        console.log(`Profile not found, retrying in 500ms... (Attempt ${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+        return fetchRole(userId, retryCount + 1);
+      } else {
+        console.error('Max retries reached. Profile not found.');
+        // Optionally handle the case where profile is never found (e.g., logout user or show specific error)
+        setRole(null);
+      }
+
     } catch (err) {
       console.error('Unexpected error fetching role:', err);
     }
@@ -51,6 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setSession(initialSession);
           setUser(initialSession?.user ?? null);
           if (initialSession?.user) {
+            // This await ensures loading stays true until retries are done
             await fetchRole(initialSession.user.id);
           }
         }
@@ -65,13 +81,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
+    } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       if (!mounted) return;
+
+      console.log('Auth state changed:', event);
 
       setSession(newSession);
       setUser(newSession?.user ?? null);
 
       if (newSession?.user) {
+        // If we just signed in, we might need to wait for the trigger
+        if (event === 'SIGNED_IN') {
+             setLoading(true); // Ensure loading is true while we fetch/retry
+        }
         await fetchRole(newSession.user.id);
       } else {
         setRole(null);
@@ -86,18 +108,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchRole]);
 
   const login = async (email: string, password: string) => {
+    setLoading(true); // Set loading true immediately on login attempt
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    // Note: onAuthStateChange will handle the success case (setting user, fetching role, setting loading false)
+    if (error) {
+        setLoading(false); // Only set loading false here if error, otherwise let the auth listener handle it
+    }
     return { error };
   };
 
   const logout = async () => {
+    setLoading(true);
     await supabase.auth.signOut();
     setRole(null);
     setUser(null);
     setSession(null);
+    setLoading(false);
   };
 
   return (
