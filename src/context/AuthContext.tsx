@@ -8,6 +8,7 @@ interface AuthContextType {
   session: Session | null;
   role: 'admin' | 'parent' | null;
   loading: boolean;
+  error: string | null;
   login: (email: string, password: string) => Promise<{ error: unknown }>;
   logout: () => Promise<void>;
 }
@@ -19,22 +20,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<'admin' | 'parent' | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchRole = useCallback(async (userId: string, retryCount = 0) => {
     try {
-      const { data, error } = await supabase
+      // Reset error on start of fetch/retry chain
+      if (retryCount === 0) setError(null);
+
+      const { data, error: queryError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', userId)
         .single();
 
-      if (error) {
+      if (queryError) {
         // If error is PGRST116 (JSON object requested, multiple (or no) rows returned), it usually means no profile found.
-        console.warn(`Attempt ${retryCount + 1}: Error fetching role:`, error.message);
+        console.warn(`Attempt ${retryCount + 1}: Error fetching role:`, queryError.message);
       }
 
       if (data) {
         setRole(data.role as 'admin' | 'parent');
+        setError(null);
         return; // Success
       }
 
@@ -46,12 +52,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return fetchRole(userId, retryCount + 1);
       } else {
         console.error('Max retries reached. Profile not found.');
-        // Optionally handle the case where profile is never found (e.g., logout user or show specific error)
         setRole(null);
+        setError('Error al cargar perfil de usuario. Por favor intenta de nuevo.');
       }
 
     } catch (err) {
       console.error('Unexpected error fetching role:', err);
+      setRole(null);
+      setError('Error inesperado al cargar perfil.');
     }
   }, []);
 
@@ -126,6 +134,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRole(null);
     setUser(null);
     setSession(null);
+    setError(null);
     setLoading(false);
   };
 
@@ -135,6 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       session,
       role,
       loading,
+      error,
       login,
       logout
     }}>

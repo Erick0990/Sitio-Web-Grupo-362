@@ -6,7 +6,7 @@ import { MainLayout } from '../components/templates/MainLayout';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login, user, role, loading } = useAuth();
+  const { login, user, role, loading, error: authContextError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -24,16 +24,19 @@ export const Login = () => {
     }
 
     // Handle case where user is authenticated but role fetch failed
-    if (!loading && user && !role) {
+    if (!loading) {
+      if (authContextError) {
+        setError(authContextError);
+        setIsSubmitting(false);
+      } else if (user && !role) {
         setError('Error crítico: No se pudo cargar tu perfil. Contacta al administrador.');
         setIsSubmitting(false);
-    }
+      }
 
-    // Reset submitting state if loading finishes (e.g. error occurred or just finished checking)
-    if (!loading) {
-        setIsSubmitting(false);
+      // Reset submitting state if loading finishes
+      setIsSubmitting(false);
     }
-  }, [user, role, loading, navigate]);
+  }, [user, role, loading, navigate, authContextError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
