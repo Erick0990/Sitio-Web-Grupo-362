@@ -1,46 +1,13 @@
-import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/atoms/Button';
 import { MainLayout } from '../components/templates/MainLayout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { supabase } from '../supabaseClient';
 import { formatRelativeTime } from '../utils/formatDate';
-
-interface Anuncio {
-  id: string;
-  titulo: string;
-  contenido: string;
-  fecha_publicacion: string;
-  user_id: string;
-}
+import { useAnuncios } from '../hooks/useAnuncios';
 
 export const ParentDashboard = () => {
   const { user, logout } = useAuth();
-  const [anuncios, setAnuncios] = useState<Anuncio[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAnuncios = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('anuncios')
-          .select('*')
-          .order('fecha_publicacion', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching announcements:', error);
-        } else {
-          setAnuncios(data || []);
-        }
-      } catch (err) {
-        console.error('Unexpected error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnuncios();
-  }, []);
+  const { anuncios, loading } = useAnuncios();
 
   return (
     <MainLayout showNavbar={false} showFooter={true} paddingTop={false}>
