@@ -14,12 +14,24 @@ export const Login = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Redirect if user is authenticated and has a role
     if (!loading && user && role) {
       if (role === 'admin') {
         navigate('/admin');
       } else {
         navigate('/dashboard');
       }
+    }
+
+    // Handle case where user is authenticated but role fetch failed
+    if (!loading && user && !role) {
+        setError('Error crítico: No se pudo cargar tu perfil. Contacta al administrador.');
+        setIsSubmitting(false);
+    }
+
+    // Reset submitting state if loading finishes (e.g. error occurred or just finished checking)
+    if (!loading) {
+        setIsSubmitting(false);
     }
   }, [user, role, loading, navigate]);
 
@@ -40,13 +52,14 @@ export const Login = () => {
       setError('Credenciales inválidas o error en el servidor.');
       setIsSubmitting(false);
     }
-    // If success, the useEffect above will handle redirection
+    // If success, the useEffect above will handle redirection or error showing
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <span className="ml-3 text-primary font-medium">Verificando credenciales...</span>
       </div>
     );
   }
