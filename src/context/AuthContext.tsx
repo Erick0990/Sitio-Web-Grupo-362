@@ -90,19 +90,61 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let mounted = true;
 
     const initializeAuth = async () => {
+      // FAIL-SAFE IMPLEMENTATION: 3-second timeout
+      let isActive = true;
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          isActive = false;
+          reject(new Error('TIMEOUT_EXCEEDED'));
+        }, 3000);
+      });
+
       try {
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        await Promise.race([
+          (async () => {
+            const { data: { session: initialSession }, error: sessionError } = await supabase.auth.getSession();
+
+            if (!isActive) return;
+            if (sessionError) throw sessionError;
+
+            if (mounted && isActive) {
+              setSession(initialSession);
+              setUser(initialSession?.user ?? null);
+            }
+
+            if (initialSession?.user) {
+              // Direct profile fetch for initial load to respect the strict timeout
+              const { data, error } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', initialSession.user.id)
+                .single();
+
+              if (!isActive) return;
+              if (error) throw error;
+
+              if (mounted && isActive && data) {
+                setRole(data.role as 'admin' | 'parent');
+              }
+            }
+          })(),
+          timeoutPromise
+        ]);
+      } catch (error) {
+        isActive = false;
+        console.error('Auth initialization fail-safe triggered:', error);
+        // Force cleanup on failure or timeout
+        try {
+          await supabase.auth.signOut();
+        } catch (e) {
+          console.error('Error signing out:', e);
+        }
 
         if (mounted) {
-          setSession(initialSession);
-          setUser(initialSession?.user ?? null);
-          if (initialSession?.user) {
-            // This await ensures loading stays true until retries are done
-            await fetchRole(initialSession.user.id);
-          }
+          setUser(null);
+          setSession(null);
+          setRole(null);
         }
-      } catch (error) {
-        console.error('Error initializing auth:', error);
       } finally {
         if (mounted) setLoading(false);
       }
