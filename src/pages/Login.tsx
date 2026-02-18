@@ -6,7 +6,7 @@ import { MainLayout } from '../components/templates/MainLayout';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login, user, role, loading, error: authContextError } = useAuth();
+  const { login, logout, user, role, loading, error: authContextError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -29,8 +29,9 @@ export const Login = () => {
         setError(authContextError);
         setIsSubmitting(false);
       } else if (user && !role) {
-        setError('Error crítico: No se pudo cargar tu perfil. Contacta al administrador.');
-        setIsSubmitting(false);
+        // This case should ideally be handled by AuthContext setting error, but as a fallback:
+        // If we have a user but no role and no error yet, wait or show generic error
+        // But AuthContext sets error if timeout.
       }
 
       // Reset submitting state if loading finishes
@@ -78,7 +79,22 @@ export const Login = () => {
         </h2>
         <p className="text-gray-500 text-center mb-8">Ingresa tus credenciales para continuar</p>
         
-        {error && <div className="bg-red-50 text-red-500 p-3 rounded-lg mb-4 text-sm text-center border border-red-200">{error}</div>}
+        {error && (
+          <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 text-sm text-center border border-red-200 shadow-sm animate-pulse">
+            <p className="font-medium mb-2">{error}</p>
+            {user && (
+              <button
+                onClick={() => {
+                  logout();
+                  setError('');
+                }}
+                className="text-primary hover:text-primary-dark font-bold underline hover:no-underline transition-all text-xs uppercase tracking-wider cursor-pointer"
+              >
+                Cerrar Sesión e Intentar de Nuevo
+              </button>
+            )}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <Input 

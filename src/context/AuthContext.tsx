@@ -22,44 +22,67 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRole = useCallback(async (userId: string, retryCount = 0) => {
-    try {
-      // Reset error on start of fetch/retry chain
-      if (retryCount === 0) setError(null);
+  const fetchRole = useCallback(async (userId: string) => {
+    // Helper to fetch with timeout
+    const fetchWithTimeout = (timeoutMs: number) => {
+      return new Promise<{ data: { role: unknown } | null, error: any }>((resolve) => {
+        const timeoutId = setTimeout(() => {
+          resolve({ data: null, error: { message: 'Timeout' } });
+        }, timeoutMs);
 
-      const { data, error: queryError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', userId)
-        .single();
+        supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', userId)
+          .single()
+          .then((result) => {
+            clearTimeout(timeoutId);
+            // supabase .single() returns { data, error }
+            // we need to cast or handle the type, assuming result structure matches
+            resolve(result as any);
+          })
+          .catch((err) => {
+            clearTimeout(timeoutId);
+            resolve({ data: null, error: err });
+          });
+      });
+    };
 
-      if (queryError) {
-        // If error is PGRST116 (JSON object requested, multiple (or no) rows returned), it usually means no profile found.
-        console.warn(`Attempt ${retryCount + 1}: Error fetching role:`, queryError.message);
-      }
+    const startTime = Date.now();
+    const TIMEOUT = 5000;
+
+    // Retry loop
+    while (Date.now() - startTime < TIMEOUT) {
+      const { data, error } = await fetchWithTimeout(2000); // 2s timeout per attempt
 
       if (data) {
         setRole(data.role as 'admin' | 'parent');
         setError(null);
-        return; // Success
+        return;
       }
 
-      // Retry logic: 3 attempts with 500ms pause
-      const maxRetries = 3;
-      if (retryCount < maxRetries) {
-        console.log(`Profile not found, retrying in 500ms... (Attempt ${retryCount + 1}/${maxRetries})`);
-        await new Promise(resolve => setTimeout(resolve, 500));
-        return fetchRole(userId, retryCount + 1);
-      } else {
-        console.error('Max retries reached. Profile not found.');
-        setRole(null);
-        setError('Error al cargar perfil de usuario. Por favor intenta de nuevo.');
+      // If error is not timeout, log it (could be RLS or missing row)
+      if (error && error.message !== 'Timeout') {
+        console.warn('Attempt failed:', error.message);
       }
 
-    } catch (err) {
-      console.error('Unexpected error fetching role:', err);
+      // Wait 1s before next retry, but don't oversleep the total timeout
+      if (Date.now() - startTime < TIMEOUT) {
+        await new Promise(r => setTimeout(r, 1000));
+      }
+    }
+
+    // One last attempt
+    console.log('Profile fetch timed out, trying one last time...');
+    const { data, error } = await fetchWithTimeout(3000); // 3s for last attempt
+
+    if (data) {
+      setRole(data.role as 'admin' | 'parent');
+      setError(null);
+    } else {
+      console.error('Final profile fetch failed:', error);
       setRole(null);
-      setError('Error inesperado al cargar perfil.');
+      setError('Error de sincronización de perfil. Contacte al administrador');
     }
   }, []);
 
