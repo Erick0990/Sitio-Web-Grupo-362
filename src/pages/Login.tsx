@@ -59,14 +59,8 @@ export const Login = () => {
     // If success, the useEffect above will handle redirection or error showing
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        <span className="ml-3 text-primary font-medium">Verificando credenciales...</span>
-      </div>
-    );
-  }
+  // REMOVED BLOCKING LOADING CHECK: Form is always visible.
+  // if (loading) { ... } -> Removed.
 
   return (
     <MainLayout showNavbar={false} showFooter={false} className="flex items-center justify-center min-h-screen bg-gradient-to-br from-primary to-secondary p-6" paddingTop={false}>
