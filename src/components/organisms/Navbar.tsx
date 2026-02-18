@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { NavLink } from '../molecules/NavLink';
 import { Button } from '../atoms/Button';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-0 left-0 w-full z-50 transition-all duration-300 bg-white shadow-sm py-4">
@@ -19,8 +20,8 @@ export const Navbar = () => {
           <NavLink to="/">Inicio</NavLink>
           <NavLink to="#secciones">Secciones</NavLink>
           <div className="flex gap-4">
-            <Button as={Link} to="/login" variant="primary" size="sm">Portal Padres</Button>
-            <Button as={Link} to="/login?role=admin" variant="admin" size="sm">Administración</Button>
+            <Button onClick={() => navigate('/login')} variant="primary" size="sm">Portal Padres</Button>
+            <Button onClick={() => navigate('/login?role=admin')} variant="admin" size="sm">Administración</Button>
           </div>
         </div>
 
@@ -45,8 +46,8 @@ export const Navbar = () => {
             <div className="flex flex-col p-6 gap-4 items-center">
               <NavLink to="/">Inicio</NavLink>
               <NavLink to="#secciones">Secciones</NavLink>
-              <Button as={Link} to="/login" variant="primary" fullWidth>Portal Padres</Button>
-              <Button as={Link} to="/login?role=admin" variant="admin" fullWidth>Administración</Button>
+              <Button onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }} variant="primary" fullWidth>Portal Padres</Button>
+              <Button onClick={() => { navigate('/login?role=admin'); setIsMobileMenuOpen(false); }} variant="admin" fullWidth>Administración</Button>
             </div>
           </motion.div>
         )}
