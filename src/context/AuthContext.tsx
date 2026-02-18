@@ -38,8 +38,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return; // Success
       }
 
-      // Retry logic if no data found or error occurred
-      const maxRetries = 5;
+      // Retry logic: 3 attempts with 500ms pause
+      const maxRetries = 3;
       if (retryCount < maxRetries) {
         console.log(`Profile not found, retrying in 500ms... (Attempt ${retryCount + 1}/${maxRetries})`);
         await new Promise(resolve => setTimeout(resolve, 500));
