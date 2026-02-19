@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchRole = useCallback(async (userId: string) => {
     // Helper to fetch with timeout
     const fetchWithTimeout = (timeoutMs: number) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return new Promise<{ data: { role: unknown } | null, error: any }>((resolve) => {
         const timeoutId = setTimeout(() => {
           resolve({ data: null, error: { message: 'Timeout' } });
@@ -39,9 +40,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             clearTimeout(timeoutId);
             // supabase .single() returns { data, error }
             // we need to cast or handle the type, assuming result structure matches
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             resolve(result as any);
-          })
-          .catch((err) => {
+          }, (err) => {
             clearTimeout(timeoutId);
             resolve({ data: null, error: err });
           });
