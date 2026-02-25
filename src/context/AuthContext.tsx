@@ -2,14 +2,17 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import type { ReactNode } from 'react';
 import { supabase } from '../supabaseClient';
 import type { Session, User as SupabaseUser } from '@supabase/supabase-js';
+import type { UserRole, UserStatus } from '../types/database';
 
 interface AuthContextType {
   user: SupabaseUser | null;
   session: Session | null;
-  role: 'admin' | 'parent' | null;
+  role: UserRole | null;
+  status: UserStatus | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<{ error: unknown; role?: 'admin' | 'parent' | null }>;
+  login: (email: string, password: string) => Promise<{ error: unknown; role?: UserRole | null; status?: UserStatus | null }>;
+  signUp: (email: string, password: string) => Promise<{ error: unknown; data?: { user: SupabaseUser | null; session: Session | null } }>;
   logout: () => Promise<void>;
 }
 
@@ -18,29 +21,27 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<'admin' | 'parent' | null>(null);
+  const [role, setRole] = useState<UserRole | null>(null);
+  const [status, setStatus] = useState<UserStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRole = useCallback(async (userId: string): Promise<'admin' | 'parent' | null> => {
+  const fetchProfile = useCallback(async (userId: string): Promise<{ role: UserRole | null, status: UserStatus | null }> => {
     // Helper to fetch with timeout
     const fetchWithTimeout = (timeoutMs: number) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return new Promise<{ data: { role: unknown } | null, error: any }>((resolve) => {
+      return new Promise<{ data: { role: unknown; status: unknown } | null, error: any }>((resolve) => {
         const timeoutId = setTimeout(() => {
           resolve({ data: null, error: { message: 'Timeout' } });
         }, timeoutMs);
 
         supabase
           .from('profiles')
-          .select('role')
+          .select('role, status')
           .eq('id', userId)
           .single()
           .then((result) => {
             clearTimeout(timeoutId);
-            // supabase .single() returns { data, error }
-            // we need to cast or handle the type, assuming result structure matches
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             resolve(result as any);
           }, (err) => {
             clearTimeout(timeoutId);
@@ -57,10 +58,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await fetchWithTimeout(2000); // 2s timeout per attempt
 
       if (data) {
-        const newRole = data.role as 'admin' | 'parent';
+        const newRole = data.role as UserRole;
+        // Default to pending if status is missing/null (though DB default should handle it)
+        const newStatus = (data.status as UserStatus) || 'pending';
+
         setRole(newRole);
+        setStatus(newStatus);
         setError(null);
-        return newRole;
+        return { role: newRole, status: newStatus };
       }
 
       // If error is not timeout, log it (could be RLS or missing row)
@@ -79,15 +84,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data, error } = await fetchWithTimeout(3000); // 3s for last attempt
 
     if (data) {
-      const newRole = data.role as 'admin' | 'parent';
+      const newRole = data.role as UserRole;
+      const newStatus = (data.status as UserStatus) || 'pending';
       setRole(newRole);
+      setStatus(newStatus);
       setError(null);
-      return newRole;
+      return { role: newRole, status: newStatus };
     } else {
       console.error('Final profile fetch failed:', error);
       setRole(null);
+      setStatus(null);
       setError('Error de sincronización de perfil. Contacte al administrador');
-      return null;
+      return { role: null, status: null };
     }
   }, []);
 
@@ -121,7 +129,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               // Direct profile fetch for initial load to respect the strict timeout
               const { data, error } = await supabase
                 .from('profiles')
-                .select('role')
+                .select('role, status')
                 .eq('id', initialSession.user.id)
                 .single();
 
@@ -129,7 +137,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               if (error) throw error;
 
               if (mounted && isActive && data) {
-                setRole(data.role as 'admin' | 'parent');
+                setRole(data.role as UserRole);
+                setStatus((data.status as UserStatus) || 'pending');
               }
             }
           })(),
@@ -149,6 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setUser(null);
           setSession(null);
           setRole(null);
+          setStatus(null);
         }
       } finally {
         if (mounted) setLoading(false);
@@ -172,9 +182,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (event === 'SIGNED_IN') {
              setLoading(true); // Ensure loading is true while we fetch/retry
         }
-        await fetchRole(newSession.user.id);
+        await fetchProfile(newSession.user.id);
       } else {
         setRole(null);
+        setStatus(null);
       }
       setLoading(false);
     });
@@ -183,7 +194,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [fetchRole]);
+  }, [fetchProfile]);
 
   const login = async (email: string, password: string) => {
     setLoading(true); // Set loading true immediately on login attempt
@@ -199,17 +210,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Explicitly fetch role here to return it to the caller for immediate redirection
     if (data.user) {
-      const userRole = await fetchRole(data.user.id);
-      return { error: null, role: userRole };
+      const { role: userRole, status: userStatus } = await fetchProfile(data.user.id);
+      return { error: null, role: userRole, status: userStatus };
     }
 
     return { error: null };
+  };
+
+  const signUp = async (email: string, password: string) => {
+    setLoading(true);
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        // If you need to redirect or pass data, do it here
+      }
+    });
+
+    if (error) {
+      setLoading(false);
+      return { error };
+    }
+
+    // We don't fetch profile here immediately because the trigger takes a moment.
+    // The onAuthStateChange will pick it up, or the user will be logged in and then fetchProfile will run.
+    setLoading(false);
+    return { error: null, data };
   };
 
   const logout = async () => {
     setLoading(true);
     await supabase.auth.signOut();
     setRole(null);
+    setStatus(null);
     setUser(null);
     setSession(null);
     setError(null);
@@ -221,9 +254,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       user,
       session,
       role,
+      status,
       loading,
       error,
       login,
+      signUp,
       logout
     }}>
       {children}

@@ -8,13 +8,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 // Interface matching the database schema
 export interface Scout {
   id: string;
-  nombre_completo: string;
-  fecha_nacimiento: string;
-  seccion: string;
+  full_name: string;
+  date_of_birth: string;
+  section: string; // 'manada' | 'tropa'
   parent_id: string;
 }
 
-const SECTION_OPTIONS = ['Manada', 'Tropa', 'Comunidad', 'Wak'];
+const SECTION_OPTIONS = [
+  { value: 'manada', label: 'Manada' },
+  { value: 'tropa', label: 'Tropa' }
+];
 
 export const MyScouts = () => {
   const [scouts, setScouts] = useState<Scout[]>([]);
@@ -27,9 +30,9 @@ export const MyScouts = () => {
 
   // Form State
   const [formData, setFormData] = useState({
-    nombre_completo: '',
-    fecha_nacimiento: '',
-    seccion: ''
+    full_name: '',
+    date_of_birth: '',
+    section: ''
   });
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,16 +62,16 @@ export const MyScouts = () => {
     if (scout) {
       setEditingScout(scout);
       setFormData({
-        nombre_completo: scout.nombre_completo,
-        fecha_nacimiento: scout.fecha_nacimiento,
-        seccion: scout.seccion
+        full_name: scout.full_name,
+        date_of_birth: scout.date_of_birth,
+        section: scout.section
       });
     } else {
       setEditingScout(null);
       setFormData({
-        nombre_completo: '',
-        fecha_nacimiento: '',
-        seccion: ''
+        full_name: '',
+        date_of_birth: '',
+        section: ''
       });
     }
     setFormError(null);
@@ -79,9 +82,9 @@ export const MyScouts = () => {
     setIsModalOpen(false);
     setEditingScout(null);
     setFormData({
-      nombre_completo: '',
-      fecha_nacimiento: '',
-      seccion: ''
+      full_name: '',
+      date_of_birth: '',
+      section: ''
     });
   };
 
@@ -91,9 +94,9 @@ export const MyScouts = () => {
   };
 
   const validateForm = () => {
-    if (!formData.nombre_completo.trim()) return 'El nombre es obligatorio';
-    if (!formData.fecha_nacimiento) return 'La fecha de nacimiento es obligatoria';
-    if (!formData.seccion) return 'La sección es obligatoria';
+    if (!formData.full_name.trim()) return 'El nombre es obligatorio';
+    if (!formData.date_of_birth) return 'La fecha de nacimiento es obligatoria';
+    if (!formData.section) return 'La sección es obligatoria';
     return null;
   };
 
@@ -114,24 +117,21 @@ export const MyScouts = () => {
         const { error } = await supabase
           .from('scouts')
           .update({
-            nombre_completo: formData.nombre_completo,
-            fecha_nacimiento: formData.fecha_nacimiento,
-            seccion: formData.seccion
+            full_name: formData.full_name,
+            date_of_birth: formData.date_of_birth,
+            section: formData.section
           })
           .eq('id', editingScout.id);
 
         if (error) throw error;
       } else {
         // Create
-        // parent_id is handled by RLS automatically on the backend via `auth.uid()` default?
-        // Wait, looking at schema: `parent_id uuid references auth.users(id) default auth.uid() not null`
-        // So we don't need to send it if the user is authenticated.
         const { error } = await supabase
           .from('scouts')
           .insert([{
-            nombre_completo: formData.nombre_completo,
-            fecha_nacimiento: formData.fecha_nacimiento,
-            seccion: formData.seccion
+            full_name: formData.full_name,
+            date_of_birth: formData.date_of_birth,
+            section: formData.section
           }]);
 
         if (error) throw error;
@@ -235,21 +235,20 @@ export const MyScouts = () => {
                 </div>
 
                 <div className="mb-4">
-                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-2
-                    ${scout.seccion === 'Manada' ? 'bg-yellow-100 text-yellow-700' :
-                      scout.seccion === 'Tropa' ? 'bg-green-100 text-green-700' :
-                      scout.seccion === 'Comunidad' ? 'bg-blue-100 text-blue-700' :
-                      'bg-red-100 text-red-700' // Wak
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 capitalize
+                    ${scout.section === 'manada' ? 'bg-yellow-100 text-yellow-700' :
+                      scout.section === 'tropa' ? 'bg-green-100 text-green-700' :
+                      'bg-gray-100 text-gray-700'
                     }
                   `}>
-                    {scout.seccion}
+                    {scout.section}
                   </span>
-                  <h3 className="text-xl font-bold text-dark">{scout.nombre_completo}</h3>
+                  <h3 className="text-xl font-bold text-dark">{scout.full_name}</h3>
                 </div>
 
                 <div className="text-gray-500 text-sm">
-                  <p>Edad: <span className="font-semibold text-dark">{calculateAge(scout.fecha_nacimiento)} años</span></p>
-                  <p>Cumpleaños: <span className="font-semibold text-dark">{new Date(scout.fecha_nacimiento).toLocaleDateString()}</span></p>
+                  <p>Edad: <span className="font-semibold text-dark">{calculateAge(scout.date_of_birth)} años</span></p>
+                  <p>Cumpleaños: <span className="font-semibold text-dark">{new Date(scout.date_of_birth).toLocaleDateString()}</span></p>
                 </div>
               </motion.div>
             ))}
@@ -281,11 +280,11 @@ export const MyScouts = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
                   label="Nombre Completo"
-                  name="nombre_completo"
-                  value={formData.nombre_completo}
+                  name="full_name"
+                  value={formData.full_name}
                   onChange={handleChange}
                   placeholder="Ej. Juan Pérez"
-                  error={!formData.nombre_completo && formError ? 'Requerido' : undefined}
+                  error={!formData.full_name && formError ? 'Requerido' : undefined}
                 />
 
                 <div>
@@ -294,24 +293,24 @@ export const MyScouts = () => {
                   </label>
                   <input
                     type="date"
-                    name="fecha_nacimiento"
-                    value={formData.fecha_nacimiento}
+                    name="date_of_birth"
+                    value={formData.date_of_birth}
                     onChange={handleChange}
                     className="flex h-12 w-full rounded-2xl border-2 border-slate-200 bg-slate-50 px-5 py-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:border-transparent transition-all duration-300"
                   />
-                  {!formData.fecha_nacimiento && formError && (
+                  {!formData.date_of_birth && formError && (
                     <p className="mt-1 text-sm text-red-500 pl-1">Requerido</p>
                   )}
                 </div>
 
                 <Select
                   label="Sección"
-                  name="seccion"
-                  value={formData.seccion}
+                  name="section"
+                  value={formData.section}
                   onChange={handleChange}
                   options={SECTION_OPTIONS}
                   placeholder="Selecciona una sección"
-                  error={!formData.seccion && formError ? 'Requerido' : undefined}
+                  error={!formData.section && formError ? 'Requerido' : undefined}
                 />
 
                 {formError && (
