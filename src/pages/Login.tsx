@@ -26,6 +26,13 @@ export const Login = () => {
     // The error display is now handled directly in the render method.
   }, [user, role, loading, navigate]);
 
+  // Reset submitting state if global error occurs
+  useEffect(() => {
+    if (authContextError) {
+      setIsSubmitting(false);
+    }
+  }, [authContextError]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLocalError('');
@@ -38,14 +45,18 @@ export const Login = () => {
     }
 
     try {
-      const { error: authError } = await login(email, password);
+      const { error: authError, role: userRole } = await login(email, password);
 
       if (authError) {
         setLocalError('Credenciales inválidas o error en el servidor.');
         setIsSubmitting(false);
       } else {
-        // Login successful, AuthContext will handle state updates and redirection via useEffect
-        // We can leave isSubmitting true until unmount or redirection
+        // Direct redirection based on the role returned by AuthContext
+        if (userRole === 'admin') {
+          navigate('/admin');
+        } else {
+          navigate('/dashboard');
+        }
       }
     } catch {
       setLocalError('Ocurrió un error inesperado.');
