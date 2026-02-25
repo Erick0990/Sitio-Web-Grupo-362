@@ -21,7 +21,7 @@ export const Navbar = () => {
           <NavLink to="#secciones">Secciones</NavLink>
           <div className="flex gap-4">
             <Button onClick={() => navigate('/login')} variant="primary" size="sm">Portal Padres</Button>
-            <Button onClick={() => navigate('/login?role=admin')} variant="admin" size="sm">Administración</Button>
+            <Button onClick={() => navigate('/login')} variant="admin" size="sm">Administración</Button>
           </div>
         </div>
 
@@ -47,7 +47,7 @@ export const Navbar = () => {
               <NavLink to="/">Inicio</NavLink>
               <NavLink to="#secciones">Secciones</NavLink>
               <Button onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }} variant="primary" fullWidth>Portal Padres</Button>
-              <Button onClick={() => { navigate('/login?role=admin'); setIsMobileMenuOpen(false); }} variant="admin" fullWidth>Administración</Button>
+              <Button onClick={() => { navigate('/login'); setIsMobileMenuOpen(false); }} variant="admin" fullWidth>Administración</Button>
             </div>
           </motion.div>
         )}

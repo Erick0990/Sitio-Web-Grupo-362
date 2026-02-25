@@ -9,7 +9,7 @@ interface AuthContextType {
   role: 'admin' | 'parent' | null;
   loading: boolean;
   error: string | null;
-  login: (email: string, password: string) => Promise<{ error: unknown }>;
+  login: (email: string, password: string) => Promise<{ error: unknown; role?: 'admin' | 'parent' | null }>;
   logout: () => Promise<void>;
 }
 
@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRole = useCallback(async (userId: string) => {
+  const fetchRole = useCallback(async (userId: string): Promise<'admin' | 'parent' | null> => {
     // Helper to fetch with timeout
     const fetchWithTimeout = (timeoutMs: number) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -57,9 +57,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { data, error } = await fetchWithTimeout(2000); // 2s timeout per attempt
 
       if (data) {
-        setRole(data.role as 'admin' | 'parent');
+        const newRole = data.role as 'admin' | 'parent';
+        setRole(newRole);
         setError(null);
-        return;
+        return newRole;
       }
 
       // If error is not timeout, log it (could be RLS or missing row)
@@ -78,12 +79,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { data, error } = await fetchWithTimeout(3000); // 3s for last attempt
 
     if (data) {
-      setRole(data.role as 'admin' | 'parent');
+      const newRole = data.role as 'admin' | 'parent';
+      setRole(newRole);
       setError(null);
+      return newRole;
     } else {
       console.error('Final profile fetch failed:', error);
       setRole(null);
       setError('Error de sincronización de perfil. Contacte al administrador');
+      return null;
     }
   }, []);
 
@@ -183,15 +187,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     setLoading(true); // Set loading true immediately on login attempt
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-    // Note: onAuthStateChange will handle the success case (setting user, fetching role, setting loading false)
+
     if (error) {
-        setLoading(false); // Only set loading false here if error, otherwise let the auth listener handle it
+        setLoading(false);
+        return { error };
     }
-    return { error };
+
+    // Explicitly fetch role here to return it to the caller for immediate redirection
+    if (data.user) {
+      const userRole = await fetchRole(data.user.id);
+      return { error: null, role: userRole };
+    }
+
+    return { error: null };
   };
 
   const logout = async () => {
