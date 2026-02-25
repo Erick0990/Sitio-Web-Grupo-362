@@ -51,6 +51,13 @@ export const Login = () => {
         setLocalError('Credenciales inválidas o error en el servidor.');
         setIsSubmitting(false);
       } else {
+        if (!userRole) {
+          logout();
+          setLocalError('Su usuario no tiene un perfil asignado en la base de datos.');
+          setIsSubmitting(false);
+          return;
+        }
+
         // Direct redirection based on the role returned by AuthContext
         if (userRole === 'admin') {
           navigate('/admin');
