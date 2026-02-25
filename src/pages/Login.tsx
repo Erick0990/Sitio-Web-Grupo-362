@@ -6,11 +6,13 @@ import { MainLayout } from '../components/templates/MainLayout';
 import { Link, useNavigate } from 'react-router-dom';
 
 export const Login = () => {
-  const { login, logout, user, role, loading, error: authContextError } = useAuth();
+  const { login, signUp, logout, user, role, loading, error: authContextError } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,8 +24,6 @@ export const Login = () => {
         navigate('/dashboard');
       }
     }
-    // We removed the synchronous state updates here to avoid linter errors and cascading renders.
-    // The error display is now handled directly in the render method.
   }, [user, role, loading, navigate]);
 
   // Reset submitting state if global error occurs
@@ -36,6 +36,7 @@ export const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLocalError('');
+    setSuccessMessage('');
     setIsSubmitting(true);
 
     if (!email || !password) {
@@ -45,24 +46,42 @@ export const Login = () => {
     }
 
     try {
-      const { error: authError, role: userRole } = await login(email, password);
-
-      if (authError) {
-        setLocalError('Credenciales inválidas o error en el servidor.');
-        setIsSubmitting(false);
-      } else {
-        if (!userRole) {
-          logout();
-          setLocalError('Su usuario no tiene un perfil asignado en la base de datos.');
-          setIsSubmitting(false);
-          return;
-        }
-
-        // Direct redirection based on the role returned by AuthContext
-        if (userRole === 'admin') {
-          navigate('/admin');
+      if (isRegistering) {
+        const { error, data } = await signUp(email, password);
+        if (error) {
+           // eslint-disable-next-line @typescript-eslint/no-explicit-any
+           setLocalError((error as any).message || 'Error al registrarse.');
+           setIsSubmitting(false);
         } else {
-          navigate('/dashboard');
+           if (data?.session) {
+             // Auto-login will be handled by onAuthStateChange
+           } else {
+             setSuccessMessage('Registro exitoso. Por favor verifica tu correo electrónico para confirmar la cuenta.');
+             setIsSubmitting(false);
+             setIsRegistering(false); // Switch back to login to show message cleanly or stay? Let's switch back.
+           }
+        }
+      } else {
+        // Login
+        const { error: authError, role: userRole } = await login(email, password);
+
+        if (authError) {
+          setLocalError('Credenciales inválidas o error en el servidor.');
+          setIsSubmitting(false);
+        } else {
+          if (!userRole) {
+            // It's possible the role is null because the trigger failed or is slow.
+            // But usually fetchProfile retries.
+            // If strictly null, maybe we logout.
+            // But let's let the effect handle navigation if role appears.
+            // If it stays null, the user stays on login?
+            // Existing logic logged out. Let's keep it safe.
+             logout();
+             setLocalError('Su usuario no tiene un perfil asignado en la base de datos.');
+             setIsSubmitting(false);
+             return;
+          }
+          // Navigation is handled by useEffect
         }
       }
     } catch {
@@ -77,6 +96,14 @@ export const Login = () => {
   // Disable button if submitting locally or if global loading is active
   const isButtonDisabled = isSubmitting || loading;
 
+  const toggleMode = () => {
+    setIsRegistering(!isRegistering);
+    setLocalError('');
+    setSuccessMessage('');
+    setEmail('');
+    setPassword('');
+  };
+
   return (
     <MainLayout showNavbar={false} showFooter={false} className="flex items-center justify-center min-h-screen bg-gradient-to-br from-primary to-secondary p-6" paddingTop={false}>
       <div className="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md animate-fade-in-up">
@@ -84,14 +111,22 @@ export const Login = () => {
           ← Volver al inicio
         </Link>
         <h2 className="text-3xl font-bold mb-2 text-center text-primary">
-          Portal Grupo 362
+          {isRegistering ? 'Crear Cuenta' : 'Portal Grupo 362'}
         </h2>
-        <p className="text-gray-500 text-center mb-8">Ingresa tus credenciales para continuar</p>
+        <p className="text-gray-500 text-center mb-8">
+          {isRegistering ? 'Únete a nuestra comunidad scout' : 'Ingresa tus credenciales para continuar'}
+        </p>
         
+        {successMessage && (
+           <div className="bg-green-50 text-green-700 p-4 rounded-lg mb-6 text-sm text-center border border-green-200 shadow-sm">
+             {successMessage}
+           </div>
+        )}
+
         {displayError && (
           <div className="bg-red-50 text-red-600 p-4 rounded-lg mb-6 text-sm text-center border border-red-200 shadow-sm animate-pulse">
             <p className="font-medium mb-2">{displayError}</p>
-            {user && (
+            {user && !isRegistering && (
               <button
                 onClick={() => {
                   logout();
@@ -112,6 +147,7 @@ export const Login = () => {
             placeholder="tu@email.com" 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            disabled={isSubmitting}
           />
           <Input 
             label="Contraseña" 
@@ -119,6 +155,7 @@ export const Login = () => {
             placeholder="••••••••" 
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            disabled={isSubmitting}
           />
           <Button 
             type="submit" 
@@ -127,12 +164,19 @@ export const Login = () => {
             size="lg"
             disabled={isButtonDisabled}
           >
-            {isButtonDisabled ? 'Verificando...' : 'Entrar al Sistema'}
+            {isButtonDisabled ? 'Procesando...' : (isRegistering ? 'Registrarse' : 'Entrar al Sistema')}
           </Button>
         </form>
 
         <div className="mt-8 text-center text-sm text-gray-500">
-          ¿No tienes cuenta? <a href="#" className="text-primary font-bold hover:underline">Contacta a tu dirigente</a>
+          {isRegistering ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?'}
+          <button
+            type="button"
+            onClick={toggleMode}
+            className="text-primary font-bold hover:underline ml-1"
+          >
+            {isRegistering ? 'Inicia Sesión' : 'Regístrate aquí'}
+          </button>
         </div>
       </div>
     </MainLayout>

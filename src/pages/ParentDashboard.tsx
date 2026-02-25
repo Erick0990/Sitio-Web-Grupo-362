@@ -69,14 +69,14 @@ export const ParentDashboard = () => {
                       className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-all duration-300"
                     >
                       <div className="flex justify-between items-start mb-3 border-b border-gray-50 pb-3">
-                        <h3 className="font-bold text-xl text-primary">{anuncio.titulo}</h3>
+                        <h3 className="font-bold text-xl text-primary">{anuncio.title}</h3>
                         <span className="text-xs font-medium text-gray-400 bg-gray-50 px-3 py-1 rounded-full whitespace-nowrap ml-2">
-                          {formatRelativeTime(anuncio.fecha_publicacion)}
+                          {formatRelativeTime(anuncio.created_at)}
                         </span>
                       </div>
 
                       <div className="text-gray-700 leading-relaxed whitespace-pre-wrap text-sm md:text-base">
-                        {anuncio.contenido}
+                        {anuncio.content}
                       </div>
                     </motion.div>
                   ))}
