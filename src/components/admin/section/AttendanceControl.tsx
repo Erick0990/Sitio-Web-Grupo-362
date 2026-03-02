@@ -15,39 +15,54 @@ export const AttendanceControl = ({ section }: AttendanceControlProps) => {
   const [attendanceMap, setAttendanceMap] = useState<Record<string, boolean>>({}); // scoutId -> isPresent
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchData();
-  }, [section, date]);
-
   const fetchData = async () => {
-    setLoading(true);
-    // Fetch scouts
-    const { data: scoutsData } = await supabase
-      .from('scouts')
-      .select('*')
-      .eq('section', section)
-      .order('full_name');
+    try {
+      setLoading(true);
+      // Fetch scouts
+      const { data: scoutsData, error: scoutsError } = await supabase
+        .from('scouts')
+        .select('*')
+        .eq('section', section)
+        .order('full_name');
 
-    // Fetch attendance for date
-    const { data: attendanceData } = await supabase
-      .from('attendance')
-      .select('scout_id, is_present')
-      .eq('date', date);
+      if (scoutsError) {
+        console.error('Error fetching scouts:', scoutsError);
+      }
 
-    setScouts(scoutsData || []);
+      // Fetch attendance for date
+      const { data: attendanceData, error: attendanceError } = await supabase
+        .from('attendance')
+        .select('scout_id, is_present')
+        .eq('date', date);
 
-    // Map attendance
-    const map: Record<string, boolean> = {};
-    if (attendanceData) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      attendanceData.forEach((a: any) => {
-        map[a.scout_id] = a.is_present;
-      });
+      if (attendanceError) {
+        console.error('Error fetching attendance:', attendanceError);
+      }
+
+      setScouts(scoutsData || []);
+
+      // Map attendance
+      const map: Record<string, boolean> = {};
+      if (attendanceData) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        attendanceData.forEach((a: any) => {
+          map[a.scout_id] = a.is_present;
+        });
+      }
+      setAttendanceMap(map);
+    } catch (err) {
+      console.error('Unexpected error fetching attendance data:', err);
+      setScouts([]);
+      setAttendanceMap({});
+    } finally {
+      setLoading(false);
     }
-    setAttendanceMap(map);
-    setLoading(false);
   };
 
+  useEffect(() => {
+    fetchData();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section, date]);
   const toggleAttendance = async (scoutId: string, currentStatus: boolean) => {
     // Optimistic Update
     setAttendanceMap(prev => ({ ...prev, [scoutId]: !currentStatus }));
@@ -108,7 +123,7 @@ export const AttendanceControl = ({ section }: AttendanceControlProps) => {
           </div>
         ) : (
           <div className="divide-y divide-slate-100">
-            {scouts.map(scout => {
+            {scouts?.map(scout => {
               const isPresent = attendanceMap[scout.id] || false;
               return (
                 <div

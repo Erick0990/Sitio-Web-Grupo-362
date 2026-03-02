@@ -21,26 +21,33 @@ export const ActiveProtagonists = ({ section, selectedScoutId, onSelectScout }: 
     section: section
   });
 
-  useEffect(() => {
-    fetchScouts();
-  }, [section]);
-
   const fetchScouts = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('scouts')
-      .select('*')
-      .eq('section', section)
-      .order('full_name');
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('scouts')
+        .select('*')
+        .eq('section', section)
+        .order('full_name');
 
-    if (error) {
-      console.error('Error fetching scouts:', error);
-    } else {
-      setScouts(data || []);
+      if (error) {
+        console.error('Error fetching scouts:', error);
+        setScouts([]);
+      } else {
+        setScouts(data || []);
+      }
+    } catch (err) {
+      console.error('Unexpected error fetching scouts:', err);
+      setScouts([]);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  useEffect(() => {
+    fetchScouts();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section]);
   const handleEditClick = (scout: Scout, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent row selection when clicking edit
     setEditingScout(scout);
@@ -102,7 +109,7 @@ export const ActiveProtagonists = ({ section, selectedScoutId, onSelectScout }: 
               </tr>
             </thead>
             <tbody>
-              {scouts.map((scout) => (
+              {scouts?.map((scout) => (
                 <tr
                   key={scout.id}
                   onClick={() => onSelectScout(scout.id === selectedScoutId ? null : scout.id)}

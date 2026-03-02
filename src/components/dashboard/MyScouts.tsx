@@ -4,6 +4,7 @@ import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Select } from '../atoms/Select';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../../context/AuthContext';
 
 // Interface matching the database schema
 export interface Scout {
@@ -20,6 +21,7 @@ const SECTION_OPTIONS = [
 ];
 
 export const MyScouts = () => {
+  const { user } = useAuth();
   const [scouts, setScouts] = useState<Scout[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,8 +53,12 @@ export const MyScouts = () => {
 
       if (error) throw error;
       setScouts(data || []);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError(String(err));
+      }
     } finally {
       setLoading(false);
     }
@@ -123,24 +129,39 @@ export const MyScouts = () => {
           })
           .eq('id', editingScout.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error updating scout:", error);
+          throw error;
+        }
       } else {
         // Create
+        if (!user?.id) {
+           throw new Error("No user ID found. Please log in again.");
+        }
+
         const { error } = await supabase
           .from('scouts')
           .insert([{
             full_name: formData.full_name,
             date_of_birth: formData.date_of_birth,
-            section: formData.section
+            section: formData.section,
+            parent_id: user.id
           }]);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Error creating scout:", error);
+          throw error;
+        }
       }
 
       await fetchScouts();
       handleCloseModal();
-    } catch (err: any) {
-      setFormError(err.message || 'Error al guardar');
+    } catch (err) {
+      if (err instanceof Error) {
+        setFormError(err.message);
+      } else {
+        setFormError('Error al guardar');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -161,8 +182,12 @@ export const MyScouts = () => {
 
       // Update local state directly to feel faster
       setScouts(prev => prev.filter(s => s.id !== id));
-    } catch (err: any) {
-      alert('Error al eliminar: ' + err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        alert('Error al eliminar: ' + err.message);
+      } else {
+        alert('Error al eliminar');
+      }
     }
   };
 
@@ -208,7 +233,7 @@ export const MyScouts = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence>
-            {scouts.map((scout) => (
+            {scouts?.map((scout) => (
               <motion.div
                 key={scout.id}
                 initial={{ opacity: 0, scale: 0.9 }}

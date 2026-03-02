@@ -18,40 +18,48 @@ export const PersonalProgress = ({ section, scoutId }: PersonalProgressProps) =>
   const [progressData, setProgressData] = useState<Progress[]>([]);
   const [newSpecialty, setNewSpecialty] = useState('');
 
+  const fetchProgress = async () => {
+    if (!scoutId) return;
+    try {
+      const { data, error } = await supabase
+        .from('progress')
+        .select('*')
+        .eq('scout_id', scoutId);
+
+      if (error) {
+        console.error('Error fetching progress:', error);
+        setProgressData([]);
+      } else {
+        setProgressData(data || []);
+      }
+    } catch (err) {
+      console.error('Unexpected error fetching progress:', err);
+      setProgressData([]);
+    }
+  };
+
   useEffect(() => {
     if (scoutId) {
       fetchProgress();
     } else {
       setProgressData([]);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scoutId]);
-
-  const fetchProgress = async () => {
-    if (!scoutId) return;
-    const { data, error } = await supabase
-      .from('progress')
-      .select('*')
-      .eq('scout_id', scoutId);
-
-    if (error) {
-      console.error('Error fetching progress:', error);
-    } else {
-      setProgressData(data || []);
-    }
-  };
-
   const handleUpdate = async (type: ProgressType, name: string, percentage: number) => {
     if (!scoutId) return;
 
     // Optimistic update
     const existing = progressData.find(p => p.type === type && p.name === name);
     const optimisticData = existing
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       ? progressData.map(p => p.id === existing.id ? { ...p, percentage: percentage as any } : p)
       : [...progressData, {
           id: 'temp',
           scout_id: scoutId,
           type,
           name,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           percentage: percentage as any,
           last_updated_by: '',
           updated_at: new Date().toISOString()
@@ -121,8 +129,8 @@ export const PersonalProgress = ({ section, scoutId }: PersonalProgressProps) =>
       <div>
         <h4 className="font-bold text-slate-800 mb-3 border-b pb-2">Etapas de Progresión</h4>
         <div className="space-y-4">
-          {stages.map(stageName => {
-            const current = progressData.find(p => p.type === 'etapa' && p.name === stageName);
+          {stages?.map(stageName => {
+            const current = progressData?.find(p => p.type === 'etapa' && p.name === stageName);
             const percentage = current ? current.percentage : 0;
 
             return (
@@ -154,7 +162,7 @@ export const PersonalProgress = ({ section, scoutId }: PersonalProgressProps) =>
         <div>
           <h4 className="font-bold text-slate-800 mb-3 border-b pb-2 mt-6">Brújulas</h4>
           <div className="space-y-4">
-            {BRUJULAS_TROPA.map(compassName => {
+            {BRUJULAS_TROPA?.map(compassName => {
               // Storing as 'etapa' but named "Brújula Bronce" to distinguish?
               // Or just "Bronce"? Wait, stages might overlap? No.
               // I'll prefix with "Brújula " to be safe or just use the name if unique.
@@ -167,7 +175,7 @@ export const PersonalProgress = ({ section, scoutId }: PersonalProgressProps) =>
               // Let's stick to simple names first. "Bronce", "Plata"...
 
               const dbName = `Brújula ${compassName}`;
-              const p = progressData.find(p => p.type === 'etapa' && p.name === dbName);
+              const p = progressData?.find(p => p.type === 'etapa' && p.name === dbName);
               const val = p ? p.percentage : 0;
 
               return (
@@ -204,8 +212,8 @@ export const PersonalProgress = ({ section, scoutId }: PersonalProgressProps) =>
         {/* List Existing */}
         <div className="space-y-2 mb-4">
           {progressData
-            .filter(p => p.type === 'especialidad')
-            .map(spec => (
+            ?.filter(p => p.type === 'especialidad')
+            ?.map(spec => (
               <div key={spec.id} className="flex items-center justify-between gap-2 bg-blue-50/50 p-2 rounded border border-blue-100">
                 <span className="text-sm font-medium text-blue-900">{spec.name}</span>
                 <div className="flex gap-1">
@@ -225,7 +233,7 @@ export const PersonalProgress = ({ section, scoutId }: PersonalProgressProps) =>
                 </div>
               </div>
           ))}
-          {progressData.filter(p => p.type === 'especialidad').length === 0 && (
+          {progressData?.filter(p => p.type === 'especialidad').length === 0 && (
             <p className="text-xs text-gray-400 italic">No hay especialidades asignadas.</p>
           )}
         </div>

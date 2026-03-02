@@ -7,10 +7,6 @@ export const ParentApproval = () => {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchPendingProfiles();
-  }, []);
-
   const fetchPendingProfiles = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -27,6 +23,10 @@ export const ParentApproval = () => {
     setLoading(false);
   };
 
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchPendingProfiles();
+  }, []);
   const approveProfile = async (id: string) => {
     const { error } = await supabase
       .from('profiles')
@@ -60,7 +60,7 @@ export const ParentApproval = () => {
               </tr>
             </thead>
             <tbody>
-              {profiles.map((profile) => (
+              {profiles?.map((profile) => (
                 <tr key={profile.id} className="bg-white border-b hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">

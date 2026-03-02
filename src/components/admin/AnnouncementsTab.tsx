@@ -23,14 +23,10 @@ export const AnnouncementsTab = () => {
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({ title: '', content: '' });
 
-  useEffect(() => {
-    fetchAnnouncements();
-  }, []);
-
   const fetchAnnouncements = async () => {
     setLoading(true);
     const { data, error } = await supabase
-      .from('announcements') // Use 'announcements' as per prompt
+      .from('announcements')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -41,6 +37,10 @@ export const AnnouncementsTab = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +126,7 @@ export const AnnouncementsTab = () => {
           ) : (
             <div className="space-y-4">
               <AnimatePresence>
-                {announcements.map(anuncio => (
+                {announcements?.map(anuncio => (
                   <motion.div
                     key={anuncio.id}
                     initial={{ opacity: 0, y: 10 }}
