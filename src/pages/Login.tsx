@@ -26,13 +26,6 @@ export const Login = () => {
     }
   }, [user, role, loading, navigate]);
 
-  // Reset submitting state if global error occurs
-  useEffect(() => {
-    if (authContextError) {
-      setIsSubmitting(false);
-    }
-  }, [authContextError]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLocalError('');
@@ -65,7 +58,7 @@ export const Login = () => {
         // Login
         const { error: authError, role: userRole } = await login(email, password);
 
-        if (authError) {
+        if (authError || authContextError) {
           setLocalError('Credenciales inválidas o error en el servidor.');
           setIsSubmitting(false);
         } else {

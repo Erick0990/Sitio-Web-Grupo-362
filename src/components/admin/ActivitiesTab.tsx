@@ -29,10 +29,6 @@ export const ActivitiesTab = () => {
     location: ''
   });
 
-  useEffect(() => {
-    fetchActivities();
-  }, []);
-
   const fetchActivities = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -48,6 +44,10 @@ export const ActivitiesTab = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchActivities();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,7 +161,7 @@ export const ActivitiesTab = () => {
           ) : (
             <div className="space-y-4">
               <AnimatePresence>
-                {activities.map(activity => (
+                {activities?.map(activity => (
                   <motion.div
                     key={activity.id}
                     initial={{ opacity: 0, x: -10 }}

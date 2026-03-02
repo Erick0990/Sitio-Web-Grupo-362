@@ -12,10 +12,6 @@ export const FinancialControl = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [amount, setAmount] = useState('0');
 
-  useEffect(() => {
-    fetchFinance();
-  }, []);
-
   const fetchFinance = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -34,6 +30,11 @@ export const FinancialControl = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchFinance();
+  }, []);
 
   const handleUpdate = async () => {
     const newBalance = parseFloat(amount);
