@@ -1,18 +1,19 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient';
+import { db } from '../../firebase';
+import { collection, query, orderBy, getDocs, addDoc, deleteDoc, doc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { TextArea } from '../atoms/TextArea';
 import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Interface matching 'announcements' table
+// Interface matching 'announcements' collection
 interface Announcement {
   id: string;
   title: string;
   content: string;
   author_id: string;
-  created_at: string;
+  createdAt: any;
   is_active: boolean;
 }
 
@@ -25,15 +26,16 @@ export const AnnouncementsTab = () => {
 
   const fetchAnnouncements = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('announcements')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
+    try {
+      const q = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const data: Announcement[] = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as Announcement);
+      });
+      setAnnouncements(data);
+    } catch (error: any) {
       console.error('Error fetching announcements:', error);
-    } else {
-      setAnnouncements(data || []);
     }
     setLoading(false);
   };
@@ -47,30 +49,29 @@ export const AnnouncementsTab = () => {
     if (!formData.title.trim() || !formData.content.trim()) return;
 
     setSubmitting(true);
-    const { error } = await supabase
-      .from('announcements')
-      .insert([{
+    try {
+      await addDoc(collection(db, 'announcements'), {
         title: formData.title,
         content: formData.content,
-        author_id: user?.id
-      }]);
-
-    if (error) {
-      alert('Error publicando anuncio: ' + error.message);
-    } else {
+        author_id: user?.id,
+        createdAt: serverTimestamp(),
+        is_active: true
+      });
       setFormData({ title: '', content: '' });
       fetchAnnouncements();
+    } catch (error: any) {
+      alert('Error publicando anuncio: ' + error.message);
     }
     setSubmitting(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Eliminar este anuncio?')) return;
-    const { error } = await supabase.from('announcements').delete().eq('id', id);
-    if (error) {
-      alert('Error eliminando: ' + error.message);
-    } else {
+    try {
+      await deleteDoc(doc(db, 'announcements', id));
       setAnnouncements(prev => prev.filter(a => a.id !== id));
+    } catch (error: any) {
+      alert('Error eliminando: ' + error.message);
     }
   };
 
@@ -148,7 +149,7 @@ export const AnnouncementsTab = () => {
                       {anuncio.content}
                     </p>
                     <div className="text-xs text-slate-400 flex justify-between items-center border-t pt-2 border-slate-100">
-                      <span>Publicado: {new Date(anuncio.created_at).toLocaleDateString()}</span>
+                      <span>Publicado: {anuncio.createdAt ? new Date(anuncio.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</span>
                       {/* Optional: Show author if needed */}
                     </div>
                   </motion.div>

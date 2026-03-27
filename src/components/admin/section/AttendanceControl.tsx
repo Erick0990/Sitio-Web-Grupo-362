@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../../supabaseClient';
+import { db } from '../../../firebase';
+import { collection, query, where, orderBy, getDocs, doc, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import type { Scout, ScoutSection } from '../../../types/database';
 import { Input } from '../../atoms/Input';
 import { useAuth } from '../../../context/AuthContext';
@@ -19,36 +20,31 @@ export const AttendanceControl = ({ section }: AttendanceControlProps) => {
     try {
       setLoading(true);
       // Fetch scouts
-      const { data: scoutsData, error: scoutsError } = await supabase
-        .from('scouts')
-        .select('*')
-        .eq('section', section)
-        .order('full_name');
-
-      if (scoutsError) {
-        console.error('Error fetching scouts:', scoutsError);
-      }
+      const scoutsQuery = query(
+        collection(db, 'scouts'),
+        where('section', '==', section),
+        orderBy('full_name', 'asc')
+      );
+      const scoutsSnapshot = await getDocs(scoutsQuery);
+      const scoutsData: Scout[] = [];
+      scoutsSnapshot.forEach((doc) => {
+        scoutsData.push({ id: doc.id, ...doc.data() } as Scout);
+      });
 
       // Fetch attendance for date
-      const { data: attendanceData, error: attendanceError } = await supabase
-        .from('attendance')
-        .select('scout_id, is_present')
-        .eq('date', date);
-
-      if (attendanceError) {
-        console.error('Error fetching attendance:', attendanceError);
-      }
-
-      setScouts(scoutsData || []);
-
-      // Map attendance
+      const attendanceQuery = query(
+        collection(db, 'attendance'),
+        where('date', '==', date)
+      );
+      const attendanceSnapshot = await getDocs(attendanceQuery);
       const map: Record<string, boolean> = {};
-      if (attendanceData) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        attendanceData.forEach((a: any) => {
-          map[a.scout_id] = a.is_present;
-        });
-      }
+
+      attendanceSnapshot.forEach((doc) => {
+        const a = doc.data();
+        map[a.scout_id] = a.is_present;
+      });
+
+      setScouts(scoutsData);
       setAttendanceMap(map);
     } catch (err) {
       console.error('Unexpected error fetching attendance data:', err);
@@ -68,30 +64,32 @@ export const AttendanceControl = ({ section }: AttendanceControlProps) => {
     setAttendanceMap(prev => ({ ...prev, [scoutId]: !currentStatus }));
 
     try {
-      const { data: existing } = await supabase
-        .from('attendance')
-        .select('id')
-        .eq('scout_id', scoutId)
-        .eq('date', date)
-        .maybeSingle();
+      // Find existing attendance doc
+      const attendanceQuery = query(
+        collection(db, 'attendance'),
+        where('scout_id', '==', scoutId),
+        where('date', '==', date)
+      );
+      const querySnapshot = await getDocs(attendanceQuery);
 
-      if (existing) {
-        await supabase
-          .from('attendance')
-          .update({
-            is_present: !currentStatus,
-            recorded_by: user?.id
-          })
-          .eq('id', existing.id);
+      if (!querySnapshot.empty) {
+        // Update existing
+        const docRef = doc(db, 'attendance', querySnapshot.docs[0].id);
+        await updateDoc(docRef, {
+          is_present: !currentStatus,
+          recorded_by: user?.id,
+          updatedAt: serverTimestamp()
+        });
       } else {
-        await supabase
-          .from('attendance')
-          .insert([{
-            scout_id: scoutId,
-            date: date,
-            is_present: !currentStatus,
-            recorded_by: user?.id
-          }]);
+        // Create new, using a composite ID for uniqueness or just let Firebase generate one
+        const docRef = doc(collection(db, 'attendance'));
+        await setDoc(docRef, {
+          scout_id: scoutId,
+          date: date,
+          is_present: !currentStatus,
+          recorded_by: user?.id,
+          createdAt: serverTimestamp()
+        });
       }
     } catch (err) {
       console.error('Error updating attendance:', err);

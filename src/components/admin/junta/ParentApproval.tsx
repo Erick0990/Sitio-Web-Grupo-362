@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../../supabaseClient';
+import { db } from '../../../firebase';
+import { collection, query, where, orderBy, getDocs, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import type { Profile } from '../../../types/database';
 import { Button } from '../../atoms/Button';
 
@@ -9,16 +10,20 @@ export const ParentApproval = () => {
 
   const fetchPendingProfiles = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('status', 'pending')
-      .order('updated_at', { ascending: false });
-
-    if (error) {
+    try {
+      const q = query(
+        collection(db, 'users'),
+        where('status', '==', 'pending'),
+        orderBy('createdAt', 'desc')
+      );
+      const querySnapshot = await getDocs(q);
+      const data: Profile[] = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as Profile);
+      });
+      setProfiles(data);
+    } catch (error) {
       console.error('Error fetching pending profiles:', error);
-    } else {
-      setProfiles(data || []);
     }
     setLoading(false);
   };
@@ -28,15 +33,16 @@ export const ParentApproval = () => {
     fetchPendingProfiles();
   }, []);
   const approveProfile = async (id: string) => {
-    const { error } = await supabase
-      .from('profiles')
-      .update({ status: 'approved', role: 'parent', updated_at: new Date().toISOString() })
-      .eq('id', id);
-
-    if (error) {
-      alert('Error aprobando perfil: ' + error.message);
-    } else {
+    try {
+      const userRef = doc(db, 'users', id);
+      await updateDoc(userRef, {
+        status: 'approved',
+        role: 'parent',
+        updatedAt: serverTimestamp()
+      });
       fetchPendingProfiles();
+    } catch (error: any) {
+      alert('Error aprobando perfil: ' + error.message);
     }
   };
 
@@ -69,7 +75,7 @@ export const ParentApproval = () => {
                     {profile.email}
                   </td>
                   <td className="px-4 py-3">
-                    {new Date(profile.updated_at).toLocaleDateString()}
+                    {profile.createdAt ? new Date(profile.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <Button
