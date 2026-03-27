@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../../supabaseClient';
+import { db } from '../../../firebase';
+import { collection, query, where, getDocs, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import type { ScoutSection, Progress, ProgressType } from '../../../types/database';
 import { Button } from '../../atoms/Button';
 import { Input } from '../../atoms/Input';
@@ -21,17 +22,13 @@ export const PersonalProgress = ({ section, scoutId }: PersonalProgressProps) =>
   const fetchProgress = async () => {
     if (!scoutId) return;
     try {
-      const { data, error } = await supabase
-        .from('progress')
-        .select('*')
-        .eq('scout_id', scoutId);
-
-      if (error) {
-        console.error('Error fetching progress:', error);
-        setProgressData([]);
-      } else {
-        setProgressData(data || []);
-      }
+      const q = query(collection(db, 'progress'), where('scout_id', '==', scoutId));
+      const querySnapshot = await getDocs(q);
+      const data: Progress[] = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as Progress);
+      });
+      setProgressData(data);
     } catch (err) {
       console.error('Unexpected error fetching progress:', err);
       setProgressData([]);
@@ -67,39 +64,26 @@ export const PersonalProgress = ({ section, scoutId }: PersonalProgressProps) =>
 
     setProgressData(optimisticData);
 
-    // DB Update
-    // Check if exists really to get ID or just upsert?
-    // Upsert needs ID or constraint. Constraint is likely just PK.
-    // So we need to find ID.
-
-    let error;
-    if (existing) {
-       const { error: updateError } = await supabase
-         .from('progress')
-         .update({ percentage, updated_at: new Date().toISOString() })
-         .eq('id', existing.id);
-       error = updateError;
-    } else {
-       const { error: insertError, data: inserted } = await supabase
-         .from('progress')
-         .insert([{
-           scout_id: scoutId,
-           type,
-           name,
-           percentage
-         }])
-         .select()
-         .single();
-
-       error = insertError;
-       if (inserted) {
-         // Update temp ID with real ID
-         fetchProgress(); // lazy reload to get ID
-       }
-    }
-
-    if (error) {
-      console.error('Error updating progress:', error);
+    try {
+      if (existing && existing.id !== 'temp') {
+        const progressRef = doc(db, 'progress', existing.id);
+        await updateDoc(progressRef, {
+          percentage,
+          updatedAt: serverTimestamp()
+        });
+      } else {
+        await addDoc(collection(db, 'progress'), {
+          scout_id: scoutId,
+          type,
+          name,
+          percentage,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        fetchProgress(); // lazy reload to get ID
+      }
+    } catch (err) {
+      console.error('Error updating progress:', err);
       alert('Error actualizando progreso');
       fetchProgress(); // Revert
     }

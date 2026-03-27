@@ -71,7 +71,7 @@ export const ParentDashboard = () => {
                       <div className="flex justify-between items-start mb-3 border-b border-gray-50 pb-3">
                         <h3 className="font-bold text-xl text-primary">{anuncio.title}</h3>
                         <span className="text-xs font-medium text-gray-400 bg-gray-50 px-3 py-1 rounded-full whitespace-nowrap ml-2">
-                          {formatRelativeTime(anuncio.created_at)}
+                          {formatRelativeTime(anuncio.createdAt ? new Date(anuncio.createdAt.seconds * 1000).toISOString() : new Date().toISOString())}
                         </span>
                       </div>
 

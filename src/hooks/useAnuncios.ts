@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../supabaseClient';
+import { db } from '../firebase';
+import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import type { Announcement } from '../types/database';
 
 export const useAnuncios = () => {
@@ -11,13 +12,13 @@ export const useAnuncios = () => {
     try {
       setLoading(true);
       setError(null);
-      const { data, error } = await supabase
-        .from('announcements')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setAnuncios(data || []);
+      const q = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'));
+      const querySnapshot = await getDocs(q);
+      const data: Announcement[] = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as Announcement);
+      });
+      setAnuncios(data);
     } catch (err) {
       console.error('Error fetching announcements:', err);
       setError('Error al cargar los anuncios');

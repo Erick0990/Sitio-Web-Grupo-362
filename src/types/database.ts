@@ -8,7 +8,8 @@ export interface Profile {
   email: string;
   role: UserRole;
   status: UserStatus;
-  updated_at: string;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 export interface Scout {
@@ -17,8 +18,8 @@ export interface Scout {
   full_name: string;
   date_of_birth: string;
   section: ScoutSection;
-  created_at: string;
-  updated_at: string;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 export interface Attendance {
@@ -27,7 +28,7 @@ export interface Attendance {
   date: string;
   is_present: boolean;
   recorded_by: string;
-  created_at: string;
+  createdAt?: any;
 }
 
 export interface Progress {
@@ -37,14 +38,15 @@ export interface Progress {
   name: string;
   percentage: 0 | 25 | 50 | 75 | 100;
   last_updated_by: string;
-  updated_at: string;
+  createdAt?: any;
+  updatedAt?: any;
 }
 
 export interface Announcement {
   id: string;
   title: string;
   content: string;
-  created_at: string;
+  createdAt?: any;
   author_id: string;
   is_active: boolean;
 }
@@ -56,12 +58,12 @@ export interface Activity {
   date: string;
   location: string;
   created_by: string;
-  created_at: string;
+  createdAt?: any;
 }
 
 export interface GroupFinance {
-  id: number;
+  id: string;
   balance: number;
-  last_updated_at: string;
+  last_updated_at?: any;
   updated_by: string;
 }

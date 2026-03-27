@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../../supabaseClient';
+import { db } from '../../../firebase';
+import { collection, query, where, orderBy, getDocs, doc, updateDoc } from 'firebase/firestore';
 import type { Scout, ScoutSection } from '../../../types/database';
 import { Button } from '../../atoms/Button';
 import { Input } from '../../atoms/Input';
@@ -24,18 +25,17 @@ export const ActiveProtagonists = ({ section, selectedScoutId, onSelectScout }: 
   const fetchScouts = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('scouts')
-        .select('*')
-        .eq('section', section)
-        .order('full_name');
-
-      if (error) {
-        console.error('Error fetching scouts:', error);
-        setScouts([]);
-      } else {
-        setScouts(data || []);
-      }
+      const q = query(
+        collection(db, 'scouts'),
+        where('section', '==', section),
+        orderBy('full_name', 'asc')
+      );
+      const querySnapshot = await getDocs(q);
+      const data: Scout[] = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as Scout);
+      });
+      setScouts(data);
     } catch (err) {
       console.error('Unexpected error fetching scouts:', err);
       setScouts([]);
@@ -61,24 +61,21 @@ export const ActiveProtagonists = ({ section, selectedScoutId, onSelectScout }: 
   const handleUpdate = async () => {
     if (!editingScout) return;
 
-    const { error } = await supabase
-      .from('scouts')
-      .update({
-        full_name: editForm.full_name, // Typically not edited here but prompt implies section/age correction. Name correction is useful too.
+    try {
+      const scoutRef = doc(db, 'scouts', editingScout.id);
+      await updateDoc(scoutRef, {
+        full_name: editForm.full_name,
         date_of_birth: editForm.date_of_birth,
         section: editForm.section
-      })
-      .eq('id', editingScout.id);
-
-    if (error) {
-      alert('Error actualizando scout: ' + error.message);
-    } else {
+      });
       setEditingScout(null);
       fetchScouts();
       // If section changed, the scout disappears from this list.
       if (editForm.section !== section) {
         onSelectScout(null);
       }
+    } catch (error: any) {
+      alert('Error actualizando scout: ' + error.message);
     }
   };
 

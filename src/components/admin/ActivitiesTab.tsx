@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient';
+import { db } from '../../firebase';
+import { collection, query, orderBy, getDocs, addDoc, deleteDoc, doc, where, serverTimestamp } from 'firebase/firestore';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { TextArea } from '../atoms/TextArea';
@@ -13,7 +14,7 @@ interface Activity {
   date: string;
   location: string;
   created_by: string;
-  created_at: string;
+  createdAt?: any;
 }
 
 export const ActivitiesTab = () => {
@@ -31,16 +32,20 @@ export const ActivitiesTab = () => {
 
   const fetchActivities = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('activities')
-      .select('*')
-      .gte('date', new Date().toISOString()) // Only upcoming? Prompt says "Próximas Actividades".
-      .order('date', { ascending: true });
-
-    if (error) {
+    try {
+      const q = query(
+        collection(db, 'activities'),
+        where('date', '>=', new Date().toISOString()),
+        orderBy('date', 'asc')
+      );
+      const querySnapshot = await getDocs(q);
+      const data: Activity[] = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as Activity);
+      });
+      setActivities(data);
+    } catch (error: any) {
       console.error('Error fetching activities:', error);
-    } else {
-      setActivities(data || []);
     }
     setLoading(false);
   };
@@ -60,32 +65,30 @@ export const ActivitiesTab = () => {
     // Ensure ISO string
     const isoDate = new Date(dateTime).toISOString();
 
-    const { error } = await supabase
-      .from('activities')
-      .insert([{
+    try {
+      await addDoc(collection(db, 'activities'), {
         title: formData.title,
         description: formData.description,
         date: isoDate,
         location: formData.location,
-        created_by: user?.id
-      }]);
-
-    if (error) {
-      alert('Error creando actividad: ' + error.message);
-    } else {
+        created_by: user?.id,
+        createdAt: serverTimestamp()
+      });
       setFormData({ title: '', description: '', date: '', time: '', location: '' });
       fetchActivities();
+    } catch (error: any) {
+      alert('Error creando actividad: ' + error.message);
     }
     setSubmitting(false);
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Eliminar esta actividad?')) return;
-    const { error } = await supabase.from('activities').delete().eq('id', id);
-    if (error) {
-      alert('Error eliminando: ' + error.message);
-    } else {
+    try {
+      await deleteDoc(doc(db, 'activities', id));
       setActivities(prev => prev.filter(a => a.id !== id));
+    } catch (error: any) {
+      alert('Error eliminando: ' + error.message);
     }
   };
 

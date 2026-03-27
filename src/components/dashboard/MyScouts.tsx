@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../supabaseClient';
+import { db } from '../../firebase';
+import { collection, query, orderBy, getDocs, doc, updateDoc, addDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { Button } from '../atoms/Button';
 import { Input } from '../atoms/Input';
 import { Select } from '../atoms/Select';
@@ -46,13 +47,15 @@ export const MyScouts = () => {
   const fetchScouts = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('scouts')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const scoutsQuery = query(collection(db, 'scouts'), orderBy('createdAt', 'asc'));
+      const querySnapshot = await getDocs(scoutsQuery);
 
-      if (error) throw error;
-      setScouts(data || []);
+      const data: Scout[] = [];
+      querySnapshot.forEach((doc) => {
+        data.push({ id: doc.id, ...doc.data() } as Scout);
+      });
+
+      setScouts(data);
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
@@ -120,38 +123,25 @@ export const MyScouts = () => {
     try {
       if (editingScout) {
         // Update
-        const { error } = await supabase
-          .from('scouts')
-          .update({
-            full_name: formData.full_name,
-            date_of_birth: formData.date_of_birth,
-            section: formData.section
-          })
-          .eq('id', editingScout.id);
-
-        if (error) {
-          console.error("Error updating scout:", error);
-          throw error;
-        }
+        const scoutRef = doc(db, 'scouts', editingScout.id);
+        await updateDoc(scoutRef, {
+          full_name: formData.full_name,
+          date_of_birth: formData.date_of_birth,
+          section: formData.section
+        });
       } else {
         // Create
         if (!user?.id) {
            throw new Error("No user ID found. Please log in again.");
         }
 
-        const { error } = await supabase
-          .from('scouts')
-          .insert([{
-            full_name: formData.full_name,
-            date_of_birth: formData.date_of_birth,
-            section: formData.section,
-            parent_id: user.id
-          }]);
-
-        if (error) {
-          console.error("Error creating scout:", error);
-          throw error;
-        }
+        await addDoc(collection(db, 'scouts'), {
+          full_name: formData.full_name,
+          date_of_birth: formData.date_of_birth,
+          section: formData.section,
+          parent_id: user.id,
+          createdAt: serverTimestamp()
+        });
       }
 
       await fetchScouts();
@@ -173,12 +163,7 @@ export const MyScouts = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from('scouts')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
+      await deleteDoc(doc(db, 'scouts', id));
 
       // Update local state directly to feel faster
       setScouts(prev => prev.filter(s => s.id !== id));

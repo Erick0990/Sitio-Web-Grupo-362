@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../../../supabaseClient';
+import { db } from '../../../firebase';
+import { doc, getDoc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import type { GroupFinance } from '../../../types/database';
 import { Button } from '../../atoms/Button';
 import { Input } from '../../atoms/Input';
@@ -14,19 +15,18 @@ export const FinancialControl = () => {
 
   const fetchFinance = async () => {
     setLoading(true);
-    const { data, error } = await supabase
-      .from('group_finance')
-      .select('*')
-      .eq('id', 1)
-      .maybeSingle();
-
-    if (data) {
-      setFinance(data);
-      setAmount(data.balance.toString());
-    } else if (!error) {
-      // Row doesn't exist? Schema says it inserts one.
-      // But if not found, we can default to 0.
-      setAmount('0');
+    try {
+      const docRef = doc(db, 'group_finance', 'main');
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = docSnap.data() as GroupFinance;
+        setFinance(data);
+        setAmount(data.balance.toString());
+      } else {
+        setAmount('0');
+      }
+    } catch (error) {
+      console.error('Error fetching finance:', error);
     }
     setLoading(false);
   };
@@ -45,40 +45,28 @@ export const FinancialControl = () => {
 
     setLoading(true);
 
-    // Check if row exists, if not insert
-    const { data: existing } = await supabase
-      .from('group_finance')
-      .select('id')
-      .eq('id', 1)
-      .maybeSingle();
+    try {
+      const docRef = doc(db, 'group_finance', 'main');
+      const docSnap = await getDoc(docRef);
 
-    let error;
-    if (existing) {
-       const { error: updateError } = await supabase
-         .from('group_finance')
-         .update({
-           balance: newBalance,
-           last_updated_at: new Date().toISOString(),
-           updated_by: user?.id
-         })
-         .eq('id', 1);
-       error = updateError;
-    } else {
-       const { error: insertError } = await supabase
-         .from('group_finance')
-         .insert([{
-           id: 1,
-           balance: newBalance,
-           updated_by: user?.id
-         }]);
-       error = insertError;
-    }
-
-    if (error) {
-      alert('Error actualizando finanzas: ' + error.message);
-    } else {
+      if (docSnap.exists()) {
+        await updateDoc(docRef, {
+          balance: Number(newBalance),
+          last_updated_at: serverTimestamp(),
+          updated_by: user?.id
+        });
+      } else {
+        await setDoc(docRef, {
+          balance: Number(newBalance),
+          updated_by: user?.id,
+          created_at: serverTimestamp(),
+          last_updated_at: serverTimestamp()
+        });
+      }
       setIsEditing(false);
       fetchFinance();
+    } catch (error: any) {
+      alert('Error actualizando finanzas: ' + error.message);
     }
     setLoading(false);
   };
@@ -97,7 +85,7 @@ export const FinancialControl = () => {
           </h2>
         )}
         <p className="text-xs text-slate-400 mt-2">
-          Actualizado: {finance?.last_updated_at ? new Date(finance.last_updated_at).toLocaleString() : 'N/A'}
+          Actualizado: {finance?.last_updated_at ? new Date((finance.last_updated_at as any).seconds * 1000).toLocaleString() : 'N/A'}
         </p>
       </div>
 
