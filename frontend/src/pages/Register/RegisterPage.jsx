@@ -1,30 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { registerUserAndScout } from '../../services/apiRegister';
-import './register.css';
+import '../../css/register.css';
 
-export default function RegisterPage() {
+export default function RegisterPage({ isEmbedded = false }) {
     const navigate = useNavigate();
     const [step, setStep] = useState(1); // 1: Encargado, 2: Scout
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
-    // --- ESTADO ÚNICO PARA TODO EL FORMULARIO ---
-    const [formData, setFormData] = useState({
-        // Datos Encargado
-        cedula: '',
-        nombre: '',
-        apellidos: '',
-        fechaNac: '',
-        email: '',
-        password: '',
-        numero: '',
-        // Datos Scout
-        scout_cedula: '',
-        scout_nombre: '',
-        scout_apellidos: '',
-        scout_fechaNac: ''
-    });
+    const initialFormState = {
+        cedula: '', nombre: '', apellidos: '', fechaNac: '', email: '', password: '', numero: '',
+        scout_cedula: '', scout_nombre: '', scout_apellidos: '', scout_fechaNac: ''
+    };
+    const [formData, setFormData] = useState(initialFormState);
 
     // --- FORMATEADORES Y HELPERS ---
     const formatToSQLDate = (dateString) => {
@@ -110,8 +99,13 @@ export default function RegisterPage() {
 
             const response = await registerUserAndScout(payload);
             alert('¡Registro exitoso! Bienvenido al Grupo 362.');
-            if (response.token) localStorage.setItem('token', response.token);
-            navigate('/login');
+            if (!isEmbedded) {
+                if (response.token) localStorage.setItem('token', response.token);
+                navigate('/login');
+            } else {
+                setFormData(initialFormState);
+                setStep(1);
+            }
         } catch (error) {
             alert(error.error || 'Ocurrió un error en el registro');
         } finally {
@@ -120,16 +114,29 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="register-container">
-            <div className="register-card">
+        <div className={isEmbedded ? '' : 'register-container'}>
+            <div className={`register-card ${isEmbedded ? 'embedded' : ''}`} style={isEmbedded ? { boxShadow: 'none', padding: '1rem', width: '100%' } : {}}>
                 {/* Botón Volver */}
-                <button
-                    className="back-link"
-                    onClick={() => step === 1 ? navigate('/login') : setStep(1)}
-                    disabled={loading}
-                >
-                    {step === 1 ? '← Volver al Login' : '← Volver al Paso 1'}
-                </button>
+                {!isEmbedded && (
+                    <button
+                        className="back-link"
+                        onClick={() => step === 1 ? navigate('/login') : setStep(1)}
+                        disabled={loading}
+                    >
+                        {step === 1 ? '← Volver al Login' : '← Volver al Paso 1'}
+                    </button>
+                )}
+                {isEmbedded && step === 2 && (
+                    <button
+                        className="btn-outline"
+                        style={{ marginBottom: '1rem', border: 'none', padding: 0 }}
+                        onClick={() => setStep(1)}
+                        disabled={loading}
+                        type="button"
+                    >
+                        ← Volver al Paso 1
+                    </button>
+                )}
 
                 <h1 className="register-title">
                     {step === 1 ? 'Registro de Encargados' : 'Información del Scout'}

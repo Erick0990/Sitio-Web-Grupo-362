@@ -1,7 +1,8 @@
-import './App.css'
+import './css/App.css'
 import heroImg from './assets/hero.png'
 import portadaImg from './assets/portada-web-362.png'
 import { useNavigate } from 'react-router-dom'
+import { Footprints, Tent } from 'lucide-react'
 
 function App() {
   const navigate = useNavigate()
@@ -37,14 +38,18 @@ function App() {
         <h2 className="sections-title">Nuestras Secciones</h2>
         <div className="cards-wrapper">
           <div className="section-card border-yellow">
-            <div className="card-icon">🐺</div>
+            <div className="card-icon" style={{ color: 'var(--color-accent)' }}>
+              <Footprints size={48} />
+            </div>
             <h3 className="card-title">Manada de Lobatos</h3>
             <p className="card-desc">
               Para niños y niñas de 6 a 10 años. ¡Aprende jugando en la selva del Seeonee!
             </p>
           </div>
           <div className="section-card border-green">
-            <div className="card-icon">🏕️</div>
+            <div className="card-icon" style={{ color: 'var(--color-secondary)' }}>
+              <Tent size={48} />
+            </div>
             <h3 className="card-title">Tropa Scout</h3>
             <p className="card-desc">
               Para jóvenes de 11 a 14 años. La aventura al aire libre, campamentos y patrullas te esperan.

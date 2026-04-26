@@ -29,7 +29,7 @@
 .brand-name {
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--primary-blue);
+  color: var(--color-primary);
   letter-spacing: -0.5px;
 }
 
@@ -49,7 +49,7 @@
 }
 
 .nav-links a:hover {
-  color: var(--primary-blue);
+  color: var(--color-primary);
 }
 
 .header-buttons {
@@ -58,7 +58,7 @@
 }
 
 .btn-portal {
-  background-color: var(--primary-blue);
+  background-color: var(--color-primary);
   color: white;
   border: none;
   padding: 0.6rem 1.25rem;
@@ -70,7 +70,7 @@
 }
 
 .btn-admin {
-  background-color: var(--secondary-green);
+  background-color: var(--color-secondary);
   color: #0b3d22;
   border: none;
   padding: 0.6rem 1.25rem;
@@ -141,7 +141,7 @@
 }
 
 .btn-cta {
-  background-color: var(--accent-yellow);
+  background-color: var(--color-accent);
   color: #000;
   border: none;
   padding: 1.1rem 2.8rem;
@@ -199,7 +199,7 @@
 
 .sections-title {
   font-size: 2.5rem;
-  color: var(--primary-blue);
+  color: var(--color-primary);
   font-weight: 800;
   margin-bottom: 3.5rem;
 }
@@ -222,11 +222,11 @@
 }
 
 .section-card.border-yellow {
-  border-top-color: var(--accent-yellow);
+  border-top-color: var(--color-accent);
 }
 
 .section-card.border-green {
-  border-top-color: var(--secondary-green);
+  border-top-color: var(--color-secondary);
 }
 
 .card-icon {

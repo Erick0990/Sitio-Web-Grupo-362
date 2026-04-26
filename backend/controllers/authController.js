@@ -11,9 +11,9 @@ const login = async (req, res) => {
     }
 
     try {
-        const result = await pool.query('SELECT obtener_usuario_login($1) AS usuario', [email]);
+        const result = await pool.query('CALL obtener_usuario_login($1, $2)', [email, null]);
 
-        const usuario = result.rows[0].usuario;
+        const usuario = result.rows[0].p_resultado;
 
         if (!usuario) {
             return res.status(401).json({ error: 'Credenciales inválidas' });

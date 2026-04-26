@@ -1,22 +1,22 @@
-CREATE OR REPLACE FUNCTION registrar_encargado_scout(
-    p_cedula VARCHAR,
-    p_nombre VARCHAR,
-    p_apellidos VARCHAR,
-    p_fecha_nacimiento DATE,
-    p_telefono VARCHAR,
-    p_email VARCHAR,
-    p_password_hash VARCHAR,
-    p_scout_cedula VARCHAR,
-    p_scout_nombre VARCHAR,
-    p_scout_apellidos VARCHAR,
-    p_scout_fecha_nacimiento DATE
+CREATE OR REPLACE PROCEDURE public.registrar_encargado_scout(
+    IN p_cedula VARCHAR,
+    IN p_nombre VARCHAR,
+    IN p_apellidos VARCHAR,
+    IN p_fecha_nacimiento DATE,
+    IN p_telefono VARCHAR,
+    IN p_email VARCHAR,
+    IN p_password_hash VARCHAR,
+    IN p_scout_cedula VARCHAR,
+    IN p_scout_nombre VARCHAR,
+    IN p_scout_apellidos VARCHAR,
+    IN p_scout_fecha_nacimiento DATE,
+    OUT p_resultado JSON
 )
-RETURNS JSON AS $$
-DECLARE
-    v_resultado JSON;
+LANGUAGE plpgsql
+AS $$
 BEGIN
-    
-    INSERT INTO usuarios (
+    -- 1. Inserción del encargado (usuario)
+    INSERT INTO public.usuarios (
         cedula, 
         nombre, 
         apellidos, 
@@ -37,8 +37,8 @@ BEGIN
         'encargado' 
     );
 
-    
-    INSERT INTO scouts (
+    -- 2. Inserción del scout vinculado
+    INSERT INTO public.scouts (
         cedula, 
         cedula_encargado, 
         nombre, 
@@ -53,8 +53,8 @@ BEGIN
         p_scout_fecha_nacimiento
     );
 
-    
-    v_resultado := json_build_object(
+    -- 3. Construcción del JSON de respuesta (se asigna directo al parámetro OUT)
+    p_resultado := json_build_object(
         'status', 'success',
         'encargado', json_build_object(
             'cedula', p_cedula,
@@ -70,10 +70,9 @@ BEGIN
         )
     );
 
-    RETURN v_resultado;
-
-EXCEPTION WHEN OTHERS THEN
-    
-    RAISE EXCEPTION 'Error al registrar el usuario o el scout: %', SQLERRM;
+EXCEPTION 
+    WHEN OTHERS THEN
+        -- Si hay un error, se hace un rollback implícito de ambos INSERTS y se lanza el error
+        RAISE EXCEPTION 'Error al registrar el usuario o el scout: %', SQLERRM;
 END;
-$$ LANGUAGE plpgsql;
+$$;
