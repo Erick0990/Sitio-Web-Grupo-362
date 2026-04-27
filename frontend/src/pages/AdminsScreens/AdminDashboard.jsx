@@ -61,7 +61,7 @@ export default function AdminDashboard() {
                     </a>
                     <a className={`nav-item ${activeTab === 'scouts' ? 'active' : ''}`} onClick={() => setActiveTab('scouts')}>
                         <span className="nav-icon"><Tent size={20} /></span>
-                        Registro de Scouts
+                        Gestión de Scouts
                     </a>
                     <a className={`nav-item ${activeTab === 'finanzas' ? 'active' : ''}`} onClick={() => setActiveTab('finanzas')}>
                         <span className="nav-icon"><CircleDollarSign size={20} /></span>
@@ -73,7 +73,7 @@ export default function AdminDashboard() {
                     </a>
                     <a className={`nav-item ${activeTab === 'asistencias' ? 'active' : ''}`} onClick={() => setActiveTab('asistencias')}>
                         <span className="nav-icon"><ClipboardCheck size={20} /></span>
-                        Control de Asistencia
+                        Inventario
                     </a>
                 </nav>
 
@@ -189,8 +189,8 @@ export default function AdminDashboard() {
                                     </p>
                                 </div>
                                 <div style={{ display: 'flex', gap: '1rem' }}>
-                                    <button 
-                                        className="btn-outline" 
+                                    <button
+                                        className="btn-outline"
                                         style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: registerType === 'admin' ? 'var(--color-primary)' : 'transparent', color: registerType === 'admin' ? 'white' : 'var(--color-primary)' }}
                                         onClick={() => setRegisterType(registerType === 'admin' ? 'none' : 'admin')}
                                     >
@@ -245,8 +245,8 @@ export default function AdminDashboard() {
                                         Añade nuevos scouts y vincula a sus encargados.
                                     </p>
                                 </div>
-                                <button 
-                                    className="btn-outline" 
+                                <button
+                                    className="btn-outline"
                                     style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: registerType === 'scout' ? 'var(--color-primary)' : 'transparent', color: registerType === 'scout' ? 'white' : 'var(--color-primary)' }}
                                     onClick={() => setRegisterType(registerType === 'scout' ? 'none' : 'scout')}
                                 >
