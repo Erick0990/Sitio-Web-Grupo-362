@@ -21,10 +21,23 @@ const EditActivityModal = ({ isOpen, onClose, onSave, activityToEdit, isSaving }
         }
     }, [activityToEdit, isOpen]);
 
+    const today = new Date().toISOString().split('T')[0];
+
     if (!isOpen || !activityToEdit) return null;
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        if (formData.fecha_inicio < today) {
+            alert("No se pueden programar actividades en fechas pasadas.");
+            return;
+        }
+
+        if (formData.fecha_fin < formData.fecha_inicio) {
+            alert("La fecha de fin no puede ser anterior a la fecha de inicio.");
+            return;
+        }
+
         onSave(activityToEdit.id, formData);
     };
 
@@ -76,11 +89,25 @@ const EditActivityModal = ({ isOpen, onClose, onSave, activityToEdit, isSaving }
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
                         <div style={{ flex: 1 }}>
                             <label className="modal-form-label">Fecha Inicio</label>
-                            <input type="date" required value={formData.fecha_inicio} onChange={(e) => setFormData({ ...formData, fecha_inicio: e.target.value })} className="modal-form-input" />
+                            <input 
+                                type="date" 
+                                required 
+                                min={today}
+                                value={formData.fecha_inicio} 
+                                onChange={(e) => setFormData({ ...formData, fecha_inicio: e.target.value })} 
+                                className="modal-form-input" 
+                            />
                         </div>
                         <div style={{ flex: 1 }}>
                             <label className="modal-form-label">Fecha Fin</label>
-                            <input type="date" required value={formData.fecha_fin} onChange={(e) => setFormData({ ...formData, fecha_fin: e.target.value })} className="modal-form-input" />
+                            <input 
+                                type="date" 
+                                required 
+                                min={formData.fecha_inicio || today}
+                                value={formData.fecha_fin} 
+                                onChange={(e) => setFormData({ ...formData, fecha_fin: e.target.value })} 
+                                className="modal-form-input" 
+                            />
                         </div>
                     </div>
 

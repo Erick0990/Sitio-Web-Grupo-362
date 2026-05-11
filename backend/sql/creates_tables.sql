@@ -86,3 +86,18 @@ CREATE TABLE public.asistencias (
     CONSTRAINT asistencias_actividad_id_fkey FOREIGN KEY (actividad_id) REFERENCES public.actividades (id) ON DELETE CASCADE,
     CONSTRAINT asistencias_scout_cedula_fkey FOREIGN KEY (scout_cedula) REFERENCES public.scouts (cedula) ON DELETE CASCADE
 );
+
+-- Tabla 6: Inventario
+
+CREATE TYPE public.estado_inventario AS ENUM ('Nuevo', 'Bueno', 'Regular', 'Malo');
+
+CREATE TABLE public.inventario (
+    id SERIAL NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    cantidad INTEGER NOT NULL DEFAULT 0,
+    estado public.estado_inventario DEFAULT 'Bueno',
+    created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    
+    CONSTRAINT inventario_pkey PRIMARY KEY (id)
+);

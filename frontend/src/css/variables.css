@@ -1,13 +1,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* Paleta de Colores Scout 362 */
-  --color-primary: #1a2b4a;      /* Camisas y pantalones (profesional) */
-  --color-secondary: #e63946;    /* Pañuelos de cuello (acento) */
-  --color-accent: #e9c46a;       /* Pases de identificación amarilla (CTAs) */
-  --color-neutral: #f3e9d2;      /* Tela de parche / Caqui claro (fondos) */
-  --color-text: #404a5c;         /* Sombras del uniforme (texto base) */
-  --color-white: #ffffff;        /* Detalles y texto en parches (limpieza) */
+  /* Colores Base Originales (Tu estilo original) */
+  --color-primary: #1a2b4a;      
+  --color-secondary: #e63946;    
+  --color-accent: #e9c46a;       
+  --color-neutral: #f3e9d2;      
+  --color-text: #404a5c;         
+  --color-white: #ffffff;        
+  
+  /* Variables Semánticas (Light Mode = Tu estilo original exacto) */
+  --bg-main: var(--color-neutral);
+  --bg-sidebar: var(--color-primary);
+  --bg-card: var(--color-white);
+  --bg-topbar: var(--color-white);
+  --text-main: var(--color-text);
+  --text-title: var(--color-primary);
+  --text-muted: rgba(64, 74, 92, 0.7);
+  --text-sidebar: rgba(255, 255, 255, 0.7);
+  --text-sidebar-active: var(--color-white);
+  --border-color: rgba(0, 0, 0, 0.05);
   
   /* Otras variables de utilidad */
   --font-main: 'Outfit', sans-serif;
@@ -20,10 +32,28 @@
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Modo Oscuro (Modo Nocturno) */
+[data-theme='dark'] {
+  --bg-main: #0f172a;           
+  --bg-sidebar: #020617;        
+  --bg-card: #1e293b;           
+  --bg-topbar: #1e293b;         
+  --text-main: #e2e8f0;         /* Gris muy claro (Slate 200) para texto general */
+  --text-title: #ffffff;        /* Blanco puro para títulos y subtítulos */
+  --text-muted: #94a3b8;        /* Slate 400 para info secundaria */
+  --text-sidebar: rgba(255, 255, 255, 0.6);
+  --text-sidebar-active: var(--color-accent);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.6);
+}
+
 body {
   font-family: var(--font-main);
-  color: var(--color-text);
-  background-color: var(--color-neutral);
+  color: var(--text-main);
+  background-color: var(--bg-main);
   margin: 0;
   padding: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }

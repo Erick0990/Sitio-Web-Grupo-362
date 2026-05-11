@@ -9,7 +9,6 @@ const getHeaders = () => {
 };
 
 export const getAdmins = async () => {
-    console.log("Iniciando peticion a /admins...");
     const response = await fetch(`${API_URL}/getinfo/admins`, {
         method: 'GET',
         headers: getHeaders(),
@@ -22,12 +21,10 @@ export const getAdmins = async () => {
     }
 
     const data = await response.json();
-    console.log("Respuesta de /admins:", data);
     return data;
 };
 
 export const getEncargados = async () => {
-    console.log("Iniciando peticion a /encargados...");
     const response = await fetch(`${API_URL}/getinfo/encargados`, {
         method: 'GET',
         headers: getHeaders(),
@@ -40,12 +37,10 @@ export const getEncargados = async () => {
     }
 
     const data = await response.json();
-    console.log("Respuesta de /encargados:", data);
     return data;
 };
 
 export const deleteUser = async (cedula) => {
-    console.log(`Iniciando peticion para eliminar usuario: ${cedula}`);
     const response = await fetch(`${API_URL}/users/${cedula}`, {
         method: 'DELETE',
         headers: getHeaders(),
@@ -62,9 +57,7 @@ export const deleteUser = async (cedula) => {
 };
 
 export const editUser = async (cedula, userData) => {
-    const API_URL_USERS = `${import.meta.env.VITE_API_URL}/users`;
-    console.log(`Iniciando peticion para editar usuario: ${cedula}`);
-    const response = await fetch(`${API_URL_USERS}/${cedula}`, {
+    const response = await fetch(`${API_URL}/users/${cedula}`, {
         method: 'PUT',
         headers: getHeaders(),
         body: JSON.stringify(userData)
@@ -82,9 +75,8 @@ export const editUser = async (cedula, userData) => {
 
 // --- Scouts ---
 export const getScouts = async () => {
-    const API_URL_SCOUTS = `${import.meta.env.VITE_API_URL}/scouts`;
-    console.log("Iniciando peticion a:", API_URL_SCOUTS);
-    const response = await fetch(API_URL_SCOUTS, {
+    console.log("Iniciando peticion a:", API_URL);
+    const response = await fetch(`${API_URL}/scouts`, {
         method: 'GET',
         headers: getHeaders(),
     });
@@ -95,14 +87,11 @@ export const getScouts = async () => {
     }
 
     const data = await response.json();
-    console.log("Respuesta de /scouts:", data);
     return data;
 };
 
 export const deleteScout = async (cedula) => {
-    const API_URL_SCOUTS = `${import.meta.env.VITE_API_URL}/scouts`;
-    console.log(`Iniciando peticion para eliminar scout: ${cedula}`);
-    const response = await fetch(`${API_URL_SCOUTS}/${cedula}`, {
+    const response = await fetch(`${API_URL}/scouts/${cedula}`, {
         method: 'DELETE',
         headers: getHeaders(),
     });
@@ -118,9 +107,7 @@ export const deleteScout = async (cedula) => {
 };
 
 export const editScout = async (cedula, scoutData) => {
-    const API_URL_SCOUTS = `${import.meta.env.VITE_API_URL}/scouts`;
-    console.log(`Iniciando peticion para editar scout: ${cedula}`);
-    const response = await fetch(`${API_URL_SCOUTS}/${cedula}`, {
+    const response = await fetch(`${API_URL}/scouts/${cedula}`, {
         method: 'PUT',
         headers: getHeaders(),
         body: JSON.stringify(scoutData)
@@ -138,8 +125,7 @@ export const editScout = async (cedula, scoutData) => {
 
 // --- Finanzas ---
 export const getFinances = async () => {
-    const API_URL_FINANCES = `${import.meta.env.VITE_API_URL}/finances`;
-    const response = await fetch(API_URL_FINANCES, {
+    const response = await fetch(`${API_URL}/finances`, {
         method: 'GET',
         headers: getHeaders(),
     });
@@ -153,8 +139,7 @@ export const getFinances = async () => {
 };
 
 export const addFinance = async (financeData) => {
-    const API_URL_FINANCES = `${import.meta.env.VITE_API_URL}/finances`;
-    const response = await fetch(API_URL_FINANCES, {
+    const response = await fetch(`${API_URL}/finances`, {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify(financeData)
@@ -170,8 +155,7 @@ export const addFinance = async (financeData) => {
 };
 
 export const deleteFinance = async (id) => {
-    const API_URL_FINANCES = `${import.meta.env.VITE_API_URL}/finances`;
-    const response = await fetch(`${API_URL_FINANCES}/${id}`, {
+    const response = await fetch(`${API_URL}/finances/${id}`, {
         method: 'DELETE',
         headers: getHeaders(),
     });
@@ -187,8 +171,7 @@ export const deleteFinance = async (id) => {
 
 // --- Actividades ---
 export const getActivities = async () => {
-    const API_URL_ACTIVITIES = `${import.meta.env.VITE_API_URL}/activities`;
-    const response = await fetch(API_URL_ACTIVITIES, {
+    const response = await fetch(`${API_URL}/activities`, {
         method: 'GET',
         headers: getHeaders(),
     });
@@ -202,8 +185,7 @@ export const getActivities = async () => {
 };
 
 export const addActivity = async (activityData) => {
-    const API_URL_ACTIVITIES = `${import.meta.env.VITE_API_URL}/activities`;
-    const response = await fetch(API_URL_ACTIVITIES, {
+    const response = await fetch(`${API_URL}/activities`, {
         method: 'POST',
         headers: getHeaders(),
         body: JSON.stringify(activityData)
@@ -219,8 +201,7 @@ export const addActivity = async (activityData) => {
 };
 
 export const editActivity = async (id, activityData) => {
-    const API_URL_ACTIVITIES = `${import.meta.env.VITE_API_URL}/activities`;
-    const response = await fetch(`${API_URL_ACTIVITIES}/${id}`, {
+    const response = await fetch(`${API_URL}/activities/${id}`, {
         method: 'PUT',
         headers: getHeaders(),
         body: JSON.stringify(activityData)
@@ -236,8 +217,7 @@ export const editActivity = async (id, activityData) => {
 };
 
 export const deleteActivity = async (id) => {
-    const API_URL_ACTIVITIES = `${import.meta.env.VITE_API_URL}/activities`;
-    const response = await fetch(`${API_URL_ACTIVITIES}/${id}`, {
+    const response = await fetch(`${API_URL}/activities/${id}`, {
         method: 'DELETE',
         headers: getHeaders(),
     });
@@ -245,6 +225,84 @@ export const deleteActivity = async (id) => {
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || 'Error al eliminar actividad');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+// --- Inventario ---
+export const getInventory = async () => {
+    const response = await fetch(`${API_URL}/inventory`, {
+        method: 'GET',
+        headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+        throw new Error('Error al obtener inventario');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+export const addInventoryItem = async (itemData) => {
+    const response = await fetch(`${API_URL}/inventory`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(itemData)
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al registrar ítem');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+export const editInventoryItem = async (id, itemData) => {
+    const response = await fetch(`${API_URL}/inventory/${id}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify(itemData)
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al editar ítem');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+export const updateInventoryQuantity = async (id, cantidad_cambio) => {
+    const response = await fetch(`${API_URL}/inventory/${id}/cantidad`, {
+        method: 'PATCH',
+        headers: getHeaders(),
+        body: JSON.stringify({ cantidad_cambio })
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al actualizar cantidad');
+    }
+
+    const data = await response.json();
+    return data;
+};
+
+export const deleteInventoryItem = async (id) => {
+    const response = await fetch(`${API_URL}/inventory/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Error al eliminar ítem');
     }
 
     const data = await response.json();
