@@ -19,7 +19,7 @@ const verifyToken = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-    if (req.user && req.user.rol === 'admin') {
+    if (req.user && req.user.rol === 'administrador') {
         next();
     } else {
         return res.status(403).json({ error: 'Acceso restringido: Se requieren permisos de administrador' });

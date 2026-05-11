@@ -23,7 +23,6 @@ CREATE TABLE public.Usuarios(
 
 -- Tabla 2: Scouts
 
-
 CREATE TABLE public.scouts (
 	cedula VARCHAR(9) NOT NULL,
 	cedula_encargado VARCHAR(9) NOT NULL,

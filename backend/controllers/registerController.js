@@ -94,15 +94,19 @@ const registerAdmin = async (req, res) => {
         const password_hash = await bcrypt.hash(password, salt);
 
         const result = await pool.query(
-            `INSERT INTO public.usuarios (cedula, nombre, apellidos, fecha_nacimiento, telefono, email, password_hash, rol)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, 'administrador')
-             RETURNING cedula, nombre, apellidos, email, rol`,
-            [cleanCedula, nombre, apellidos, fecha_nacimiento, telefono || '', email, password_hash]
+            `CALL registrar_administrador(
+                $1::VARCHAR, $2::VARCHAR, $3::VARCHAR, $4::DATE, 
+                $5::VARCHAR, $6::VARCHAR, $7::VARCHAR, $8::JSON
+            )`,
+            [
+                cleanCedula, nombre, apellidos, fecha_nacimiento,
+                telefono || null, email, password_hash, null
+            ]
         );
 
         res.status(201).json({
             message: 'Administrador registrado exitosamente',
-            admin: result.rows[0]
+            admin: result.rows[0].p_resultado
         });
 
     } catch (error) {
