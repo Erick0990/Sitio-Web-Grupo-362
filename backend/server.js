@@ -5,6 +5,11 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const registerRoutes = require('./routes/registerRoutes');
 const getInfoRoutes = require('./routes/getInfoRoutes');
+const userRoutes = require('./routes/userRoutes');
+const scoutRoutes = require('./routes/scoutRoutes');
+const financeRoutes = require('./routes/financeRoutes');
+const activityRoutes = require('./routes/activityRoutes');
+const inventoryRoutes = require('./routes/inventoryRoutes');
 
 const app = express();
 
@@ -16,11 +21,11 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/register', registerRoutes);
 app.use('/api/getinfo', getInfoRoutes);
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/scouts', require('./routes/scoutRoutes'));
-app.use('/api/finances', require('./routes/financeRoutes'));
-app.use('/api/activities', require('./routes/activityRoutes'));
-app.use('/api/inventory', require('./routes/inventoryRoutes'));
+app.use('/api/users', userRoutes);
+app.use('/api/scouts', scoutRoutes);
+app.use('/api/finances', financeRoutes);
+app.use('/api/activities', activityRoutes);
+app.use('/api/inventory', inventoryRoutes);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

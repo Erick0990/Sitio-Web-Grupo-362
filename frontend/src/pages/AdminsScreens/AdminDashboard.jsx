@@ -56,7 +56,7 @@ export default function AdminDashboard() {
             <aside className="admin-sidebar">
                 <div className="sidebar-header">
                     <div className="sidebar-logo">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--color-primary)' }}>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-title)' }}>
                             <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
                         </svg>
                     </div>
@@ -126,7 +126,7 @@ export default function AdminDashboard() {
                                 transition: 'background 0.2s',
                                 marginRight: '1rem'
                             }}
-                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.05)'}
+                            onMouseOver={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-hover)'}
                             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                             title={theme === 'light' ? 'Activar modo oscuro' : 'Activar modo claro'}
                         >
@@ -154,8 +154,8 @@ export default function AdminDashboard() {
 
                     {activeTab !== 'inicio' && activeTab !== 'usuarios' && activeTab !== 'scouts' && activeTab !== 'finanzas' && activeTab !== 'actividades' && activeTab !== 'inventario' && (
                         <div className="content-section" style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <div style={{ textAlign: 'center', color: 'var(--color-text)', opacity: 0.7 }}>
-                                <div style={{ marginBottom: '1rem', color: 'var(--color-primary)' }}><Activity size={64} opacity={0.5} /></div>
+                            <div style={{ textAlign: 'center', color: 'var(--text-main)', opacity: 0.7 }}>
+                                <div style={{ marginBottom: '1rem', color: 'var(--text-title)' }}><Activity size={64} opacity={0.5} /></div>
                                 <h2>Módulo en Construcción</h2>
                                 <p>Esta sección estará disponible próximamente con funcionalidades conectadas a la base de datos.</p>
                             </div>

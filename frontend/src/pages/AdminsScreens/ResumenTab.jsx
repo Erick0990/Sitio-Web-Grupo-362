@@ -134,7 +134,7 @@ export default function ResumenTab() {
                                 stats.recentFinances.map(f => (
                                     <div key={f.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid var(--border-color)' }}>
                                         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                            <div style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', backgroundColor: f.tipo === 'ingreso' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)' }}>
+                                            <div style={{ padding: '0.5rem', borderRadius: 'var(--radius-sm)', backgroundColor: f.tipo === 'ingreso' ? 'var(--color-success-bg)' : 'var(--color-danger-bg)' }}>
                                                 {f.tipo === 'ingreso' ? <ArrowUpRight size={18} color="#10b981" /> : <ArrowDownRight size={18} color="#ef4444" />}
                                             </div>
                                             <div>
@@ -158,7 +158,7 @@ export default function ResumenTab() {
                                 <AlertTriangle size={20} color="#f59e0b" />
                                 <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--text-title)' }}>Alertas de Inventario</h3>
                             </div>
-                            <span style={{ fontSize: '0.75rem', fontWeight: 600, padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', backgroundColor: '#fef3c7', color: '#d97706' }}>
+                            <span style={{ fontSize: '0.75rem', fontWeight: 600, padding: '0.2rem 0.6rem', borderRadius: 'var(--radius-sm)', backgroundColor: 'var(--color-warning-bg)', color: 'var(--color-warning-text)' }}>
                                 {stats.lowStockItems.length} alertas
                             </span>
                         </div>
@@ -192,7 +192,7 @@ export default function ResumenTab() {
 
                 {/* Columna Derecha: Próximas Actividades */}
                 <div className="content-section" style={{ padding: '0' }}>
-                    <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--border-color)' }}>
+                    <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'var(--bg-card-inner)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <CalendarDays size={22} color="var(--color-primary)" />
                             <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--text-title)' }}>Calendario Próximo</h3>
@@ -208,7 +208,7 @@ export default function ResumenTab() {
                         ) : (
                             stats.upcomingActivities.map(act => (
                                 <div key={act.id} style={{ display: 'flex', gap: '1.5rem', padding: '1.5rem', borderBottom: '1px solid var(--border-color)', position: 'relative' }}>
-                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '60px', height: '60px', backgroundColor: 'var(--color-primary)', color: '#ffffff', borderRadius: 'var(--radius-md)', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minWidth: '60px', height: '60px', backgroundColor: 'var(--color-primary)', color: '#ffffff', borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-sm)' }}>
                                         <span style={{ fontSize: '1.2rem', fontWeight: 800 }}>{new Date(act.fecha_inicio).getDate()}</span>
                                         <span style={{ fontSize: '0.7rem', textTransform: 'uppercase', fontWeight: 600 }}>{new Date(act.fecha_inicio).toLocaleString('es-CR', { month: 'short' })}</span>
                                     </div>

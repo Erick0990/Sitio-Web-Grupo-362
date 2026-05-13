@@ -15,17 +15,33 @@ const getInventory = async (req, res) => {
 // Registrar un nuevo ítem
 const addInventoryItem = async (req, res) => {
     try {
-        const { nombre, descripcion, cantidad, estado } = req.body;
+        // 1. Verificamos si req.body es un arreglo; si no lo es, lo convertimos en uno de un solo elemento
+        const items = Array.isArray(req.body) ? req.body : [req.body];
 
-        if (!nombre || cantidad === undefined) {
-            return res.status(400).json({ error: 'El nombre y la cantidad son requeridos' });
+        // 2. Recorremos el arreglo y procesamos cada ítem
+        for (const item of items) {
+            const { nombre, descripcion, cantidad, estado } = item;
+
+            // Validación por cada ítem
+            if (!nombre || cantidad === undefined) {
+                return res.status(400).json({ error: 'El nombre y la cantidad son requeridos en uno o más ítems' });
+            }
+
+            // Inserción en la base de datos
+            await pool.query('CALL registrar_item($1, $2, $3, $4)', [
+                nombre,
+                descripcion ? descripcion : null,
+                parseInt(cantidad),
+                estado || 'Bueno'
+            ]);
         }
 
-        await pool.query('CALL registrar_item($1, $2, $3, $4)', [nombre, descripcion ? descripcion : null, parseInt(cantidad), estado || 'Bueno']);
-        res.status(201).json({ message: 'Ítem registrado exitosamente' });
+        // 3. Respuesta exitosa una vez que termine el ciclo
+        res.status(201).json({ message: 'Ítem(s) registrado(s) exitosamente' });
+
     } catch (error) {
         console.error('Error in addInventoryItem:', error);
-        res.status(500).json({ error: 'Error interno del servidor al registrar ítem' });
+        res.status(500).json({ error: 'Error interno del servidor al registrar ítem(s)' });
     }
 };
 

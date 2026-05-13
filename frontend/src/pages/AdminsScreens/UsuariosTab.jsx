@@ -4,6 +4,7 @@ import RegisterAdmin from '../Register/RegisterAdmin';
 import DeleteConfirmModal from '../../components/DeleteConfirmModal';
 import EditUserModal from '../../components/EditUserModal';
 import { getAdmins, getEncargados, deleteUser, editUser } from '../../services/apiGetInfo';
+import Pagination from '../../components/Pagination';
 
 export default function UsuariosTab() {
     const [admins, setAdmins] = useState([]);
@@ -20,6 +21,11 @@ export default function UsuariosTab() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [userToEdit, setUserToEdit] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
+
+    // Paginación
+    const [adminsCurrentPage, setAdminsCurrentPage] = useState(1);
+    const [encargadosCurrentPage, setEncargadosCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     useEffect(() => {
         fetchUsersData();
@@ -78,13 +84,27 @@ export default function UsuariosTab() {
         }
     };
 
+    // Lógica de Paginación para Administradores
+    const adminsTotalPages = Math.ceil(admins.length / itemsPerPage);
+    const paginatedAdmins = admins.slice(
+        (adminsCurrentPage - 1) * itemsPerPage,
+        adminsCurrentPage * itemsPerPage
+    );
+
+    // Lógica de Paginación para Encargados
+    const encargadosTotalPages = Math.ceil(encargados.length / itemsPerPage);
+    const paginatedEncargados = encargados.slice(
+        (encargadosCurrentPage - 1) * itemsPerPage,
+        encargadosCurrentPage * itemsPerPage
+    );
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {/* Panel de Acciones */}
             <div className="content-section" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                     <h2 className="section-title">Administradores</h2>
-                    <p style={{ color: 'var(--color-text)', opacity: 0.7, margin: '0.5rem 0 0 0', fontSize: '0.9rem' }}>
+                    <p style={{ color: 'var(--text-main)', opacity: 0.7, margin: '0.5rem 0 0 0', fontSize: '0.9rem' }}>
                         Gestiona las cuentas con acceso administrativo al sistema.
                     </p>
                 </div>
@@ -110,31 +130,31 @@ export default function UsuariosTab() {
             {/* Historial de Administradores */}
             <div className="content-section">
                 <h2 className="section-title" style={{ marginBottom: '1.5rem' }}>Directorio de Administradores</h2>
-                <div style={{ border: '1px solid rgba(0,0,0,0.05)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                <div style={{ border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead style={{ backgroundColor: 'rgba(26, 43, 74, 0.05)' }}>
+                        <thead style={{ backgroundColor: 'var(--bg-card-inner)' }}>
                             <tr>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Cédula</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Nombre Completo</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>F. Nacimiento</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Teléfono</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Correo Electrónico</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Rol</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600, textAlign: 'center' }}>Acciones</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Cédula</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Nombre Completo</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>F. Nacimiento</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Teléfono</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Correo Electrónico</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Rol</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600, textAlign: 'center' }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {isLoading ? (
-                                <tr style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text)', opacity: 0.6 }}>Cargando administradores...</td>
+                                <tr style={{ borderTop: '1px solid var(--border-light)' }}>
+                                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-main)', opacity: 0.6 }}>Cargando administradores...</td>
                                 </tr>
                             ) : admins.length === 0 ? (
-                                <tr style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text)', opacity: 0.6 }}>No hay administradores registrados.</td>
+                                <tr style={{ borderTop: '1px solid var(--border-light)' }}>
+                                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-main)', opacity: 0.6 }}>No hay administradores registrados.</td>
                                 </tr>
                             ) : (
-                                admins.map(admin => (
-                                    <tr key={admin.cedula} style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                                paginatedAdmins.map(admin => (
+                                    <tr key={admin.cedula} style={{ borderTop: '1px solid var(--border-light)' }}>
                                         <td style={{ padding: '1rem' }}>{admin.cedula}</td>
                                         <td style={{ padding: '1rem' }}>{admin.nombre} {admin.apellidos}</td>
                                         <td style={{ padding: '1rem' }}>{new Date(admin.fecha_nacimiento).toLocaleDateString()}</td>
@@ -142,7 +162,7 @@ export default function UsuariosTab() {
                                         <td style={{ padding: '1rem' }}>{admin.email}</td>
                                         <td style={{ padding: '1rem', textTransform: 'capitalize' }}>{admin.rol}</td>
                                         <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                            <button className="action-btn" title="Editar" onClick={() => handleEditClick(admin)} style={{ background: 'none', border: 'none', cursor: 'pointer', margin: '0 5px', color: 'var(--color-primary)' }}><Edit size={18} /></button>
+                                            <button className="action-btn" title="Editar" onClick={() => handleEditClick(admin)} style={{ background: 'none', border: 'none', cursor: 'pointer', margin: '0 5px', color: 'var(--text-title)' }}><Edit size={18} /></button>
                                             <button className="action-btn" title="Eliminar" onClick={() => handleDeleteClick(admin)} style={{ background: 'none', border: 'none', cursor: 'pointer', margin: '0 5px', color: '#dc3545' }}><Trash2 size={18} /></button>
                                         </td>
                                     </tr>
@@ -151,13 +171,22 @@ export default function UsuariosTab() {
                         </tbody>
                     </table>
                 </div>
+                {admins.length > 0 && (
+                    <div style={{ borderTop: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card)', borderBottomLeftRadius: 'var(--radius-md)', borderBottomRightRadius: 'var(--radius-md)' }}>
+                        <Pagination 
+                            currentPage={adminsCurrentPage} 
+                            totalPages={adminsTotalPages} 
+                            onPageChange={setAdminsCurrentPage} 
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Panel de Encargados */}
             <div className="content-section" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
                 <div>
                     <h2 className="section-title">Encargados (Padres/Tutores)</h2>
-                    <p style={{ color: 'var(--color-text)', opacity: 0.7, margin: '0.5rem 0 0 0', fontSize: '0.9rem' }}>
+                    <p style={{ color: 'var(--text-main)', opacity: 0.7, margin: '0.5rem 0 0 0', fontSize: '0.9rem' }}>
                         Directorio de encargados de los scouts. Se añaden automáticamente al registrar un scout.
                     </p>
                 </div>
@@ -165,32 +194,32 @@ export default function UsuariosTab() {
 
             {/* Tabla de Encargados */}
             <div className="content-section">
-                <h2 className="section-title" style={{ marginBottom: '1.5rem' }}>Directorio de Encargados</h2>
-                <div style={{ border: '1px solid rgba(0,0,0,0.05)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
+                <h2 className="section-title" style={{ marginBottom: '1.5rem' }}>Directorio de Tutores/Encargados legales</h2>
+                <div style={{ border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                        <thead style={{ backgroundColor: 'rgba(26, 43, 74, 0.05)' }}>
+                        <thead style={{ backgroundColor: 'var(--bg-card-inner)' }}>
                             <tr>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Cédula</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Nombre Completo</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>F. Nacimiento</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Teléfono</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Correo Electrónico</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600 }}>Rol</th>
-                                <th style={{ padding: '1rem', color: 'var(--color-primary)', fontWeight: 600, textAlign: 'center' }}>Acciones</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Cédula</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Nombre Completo</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>F. Nacimiento</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Teléfono</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Correo Electrónico</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600 }}>Rol</th>
+                                <th style={{ padding: '1rem', color: 'var(--text-title)', fontWeight: 600, textAlign: 'center' }}>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                             {isLoading ? (
-                                <tr style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text)', opacity: 0.6 }}>Cargando encargados...</td>
+                                <tr style={{ borderTop: '1px solid var(--border-light)' }}>
+                                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-main)', opacity: 0.6 }}>Cargando encargados...</td>
                                 </tr>
                             ) : encargados.length === 0 ? (
-                                <tr style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
-                                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--color-text)', opacity: 0.6 }}>No hay encargados registrados.</td>
+                                <tr style={{ borderTop: '1px solid var(--border-light)' }}>
+                                    <td colSpan="7" style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-main)', opacity: 0.6 }}>No hay encargados registrados.</td>
                                 </tr>
                             ) : (
-                                encargados.map(enc => (
-                                    <tr key={enc.cedula} style={{ borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+                                paginatedEncargados.map(enc => (
+                                    <tr key={enc.cedula} style={{ borderTop: '1px solid var(--border-light)' }}>
                                         <td style={{ padding: '1rem' }}>{enc.cedula}</td>
                                         <td style={{ padding: '1rem' }}>{enc.nombre} {enc.apellidos}</td>
                                         <td style={{ padding: '1rem' }}>{new Date(enc.fecha_nacimiento).toLocaleDateString()}</td>
@@ -198,7 +227,7 @@ export default function UsuariosTab() {
                                         <td style={{ padding: '1rem' }}>{enc.email}</td>
                                         <td style={{ padding: '1rem', textTransform: 'capitalize' }}>{enc.rol}</td>
                                         <td style={{ padding: '1rem', textAlign: 'center' }}>
-                                            <button className="action-btn" title="Editar" onClick={() => handleEditClick(enc)} style={{ background: 'none', border: 'none', cursor: 'pointer', margin: '0 5px', color: 'var(--color-primary)' }}><Edit size={18} /></button>
+                                            <button className="action-btn" title="Editar" onClick={() => handleEditClick(enc)} style={{ background: 'none', border: 'none', cursor: 'pointer', margin: '0 5px', color: 'var(--text-title)' }}><Edit size={18} /></button>
                                             <button className="action-btn" title="Eliminar" onClick={() => handleDeleteClick(enc)} style={{ background: 'none', border: 'none', cursor: 'pointer', margin: '0 5px', color: '#dc3545' }}><Trash2 size={18} /></button>
                                         </td>
                                     </tr>
@@ -207,6 +236,15 @@ export default function UsuariosTab() {
                         </tbody>
                     </table>
                 </div>
+                {encargados.length > 0 && (
+                    <div style={{ borderTop: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card)', borderBottomLeftRadius: 'var(--radius-md)', borderBottomRightRadius: 'var(--radius-md)' }}>
+                        <Pagination 
+                            currentPage={encargadosCurrentPage} 
+                            totalPages={encargadosTotalPages} 
+                            onPageChange={setEncargadosCurrentPage} 
+                        />
+                    </div>
+                )}
             </div>
 
             <DeleteConfirmModal

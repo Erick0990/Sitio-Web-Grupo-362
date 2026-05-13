@@ -7,8 +7,8 @@
 }
 
 body {
-  background-color: var(--color-neutral);
-  color: var(--color-text);
+  background-color: var(--bg-main);
+  color: var(--text-main);
   font-family: var(--font-main);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

@@ -169,3 +169,29 @@
     from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* Fixes for embedded view in Admin Dashboard Dark Mode */
+.register-card.embedded {
+    background-color: transparent;
+}
+.register-card.embedded label,
+.register-card.embedded .register-title {
+    color: var(--text-title);
+}
+.register-card.embedded .register-subtitle {
+    color: var(--text-main);
+}
+.register-card.embedded input, 
+.register-card.embedded select {
+    background-color: var(--bg-input);
+    color: var(--text-main);
+    border-color: var(--border-strong);
+}
+.register-card.embedded input:focus, 
+.register-card.embedded select:focus {
+    background-color: var(--bg-hover);
+}
+.register-card.embedded input[readonly] {
+    background-color: var(--bg-hover);
+    color: var(--text-muted);
+}
